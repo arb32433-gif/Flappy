@@ -65,6 +65,15 @@ class GameHandler(http.server.SimpleHTTPRequestHandler):
                 stats = db.get_stats(difficulty=diff)
                 self.send_json(stats)
 
+            elif path == "/api/archives":
+                diff = params.get("difficulty")
+                archives = db.get_archives(limit=50, difficulty=diff)
+                count = db.get_archive_count()
+                self.send_json({"archives": archives, "count": count})
+
+            elif path == "/api/archives/count":
+                self.send_json({"count": db.get_archive_count()})
+
             else:
                 self.send_json({"error": "Not found"}, 404)
         except Exception as e:
@@ -86,6 +95,18 @@ class GameHandler(http.server.SimpleHTTPRequestHandler):
                 is_high = db.add_score(int(score), difficulty)
                 high = db.get_high_score(difficulty=difficulty)
                 self.send_json({"ok": True, "is_high": bool(is_high), "high_score": high})
+            elif path.endswith("/archive") and path.startswith("/api/scores/"):
+                try:
+                    score_id = int(path.split("/")[-2])
+                    result = db.add_archive(score_id)
+                    if result["ok"]:
+                        self.send_json({"ok": True, "archived_at": result["archived_at"]})
+                    elif result["reason"] == "exists":
+                        self.send_json({"ok": True, "already": True, "message": "Already archived"})
+                    else:
+                        self.send_json({"error": "Score not found"}, 404)
+                except (ValueError, IndexError):
+                    self.send_json({"error": "Invalid id"}, 400)
             else:
                 self.send_json({"error": "Not found"}, 404)
         except Exception as e:
@@ -101,6 +122,13 @@ class GameHandler(http.server.SimpleHTTPRequestHandler):
                 try:
                     score_id = int(path.split("/")[-1])
                     db.delete_score(score_id)
+                    self.send_json({"ok": True})
+                except (ValueError, IndexError):
+                    self.send_json({"error": "Invalid id"}, 400)
+            elif path.startswith("/api/archives/"):
+                try:
+                    archive_id = int(path.split("/")[-1])
+                    db.delete_archive(archive_id)
                     self.send_json({"ok": True})
                 except (ValueError, IndexError):
                     self.send_json({"error": "Invalid id"}, 400)

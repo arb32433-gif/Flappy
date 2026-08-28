@@ -4,6 +4,29 @@ All notable changes and development milestones for the Flappy Bird project are d
 
 ---
 
+## [0.3.1] - 2026-08-29
+
+### Added - Score Archiving Feature (End-to-End)
+Gameplay flight records can now be archived, showing a persistent "Saved" indicator and updating counts dynamically.
+
+#### Database (`db.py`)
+- Created `archives` table to store archived score snapshots.
+- Added database functions `add_archive()`, `get_archives()`, `get_archive_count()`, and `delete_archive()`.
+- Implemented `_with_archive_flag()` helper to dynamically attach an `archived` binary flag to all fetched scores.
+
+#### REST API (`server.py`)
+- `GET /api/archives` — List archived records.
+- `GET /api/archives/count` — Retrieve total count of saved records.
+- `POST /api/scores/{id}/archive` — Copy a flight record to the archives table.
+- `DELETE /api/archives/{id}` — Terminate an archive.
+
+#### Frontend UI & Logic (`SRC/index.html`, `SRC/style.css`, `SRC/game.js`)
+- **HTML**: Injected `data-arch-count` panel to display archived score statistics next to total count. Added a dedicated "Save/Saved" button action column.
+- **CSS**: Created custom `.record-btn-save` configurations, featuring transition hover cues, HSL tailored styles, and disabled layouts for already-archived records.
+- **JS**: Wrapped asynchronous REST endpoints in `ScoreAPI.archiveScore` and `ScoreAPI.getArchives()`. Implemented event listener callbacks for the new table action columns.
+
+---
+
 ## [0.3.0] - 2026-08-28
 
 ### Added - SQLite Score Persistence & REST API
@@ -169,7 +192,8 @@ The game is complete with all core features implemented and playable.
 | 0.1.0 | 2026-08-27 | Full game implementation complete |
 | 0.2.0 | 2026-08-28 | Renamed to flappyflight; offline Windows packaging via Tauri v2 |
 | 0.3.0 | 2026-08-28 | SQLite score persistence and REST API |
+| 0.3.1 | 2026-08-29 | SQLite score archiving backend implementation |
 
 ---
 
-*Last Updated: 2026-08-28*
+*Last Updated: 2026-08-29*

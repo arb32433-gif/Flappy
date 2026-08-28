@@ -46,6 +46,17 @@ def init_db():
                 created_at TEXT NOT NULL
             )
         """)
+        conn.execute("""
+            CREATE TABLE IF NOT EXISTS archives (
+                id INTEGER PRIMARY KEY AUTOINCREMENT,
+                source_id INTEGER,
+                score INTEGER NOT NULL,
+                difficulty TEXT NOT NULL DEFAULT 'medium',
+                is_high INTEGER NOT NULL DEFAULT 0,
+                created_at TEXT NOT NULL,
+                archived_at TEXT NOT NULL
+            )
+        """)
 
 
 def add_score(score, difficulty="medium"):
@@ -85,7 +96,7 @@ def get_recent_scores(limit=20, difficulty=None):
             rows = conn.execute(
                 "SELECT * FROM scores ORDER BY created_at DESC LIMIT ?", (limit,)
             ).fetchall()
-        return [dict(r) for r in rows]
+        return _with_archive_flag(conn, rows)
 
 
 def get_all_scores(difficulty=None):
@@ -99,12 +110,72 @@ def get_all_scores(difficulty=None):
             rows = conn.execute(
                 "SELECT * FROM scores ORDER BY created_at DESC"
             ).fetchall()
-        return [dict(r) for r in rows]
+        return _with_archive_flag(conn, rows)
+
+
+def _with_archive_flag(conn, rows):
+    """Attach an 'archived' flag to each score row from the archives table."""
+    result = []
+    for r in rows:
+        item = dict(r)
+        archived = conn.execute(
+            "SELECT id FROM archives WHERE source_id = ?", (item["id"],)
+        ).fetchone()
+        item["archived"] = 1 if archived else 0
+        result.append(item)
+    return result
 
 
 def delete_score(score_id):
     with db_session() as conn:
         conn.execute("DELETE FROM scores WHERE id = ?", (score_id,))
+
+
+def add_archive(score_id):
+    """Copy a score record into the archives table (keeps original in scores)."""
+    with db_session() as conn:
+        row = conn.execute("SELECT * FROM scores WHERE id = ?", (score_id,)).fetchone()
+        if not row:
+            return {'ok': False, 'reason': 'not found'}
+
+        existing = conn.execute(
+            "SELECT id FROM archives WHERE source_id = ?", (score_id,)
+        ).fetchone()
+        if existing:
+            return {'ok': False, 'reason': 'exists'}
+
+        conn.execute(
+            """INSERT INTO archives (source_id, score, difficulty, is_high, created_at, archived_at)
+               VALUES (?, ?, ?, ?, ?, ?)""",
+            (row["id"], row["score"], row["difficulty"], row["is_high"],
+             row["created_at"], datetime.now().isoformat())
+        )
+        return {'ok': True, 'archived_at': datetime.now().isoformat()}
+
+
+def get_archives(limit=50, difficulty=None):
+    with db_session() as conn:
+        if difficulty:
+            rows = conn.execute(
+                "SELECT * FROM archives WHERE difficulty = ? ORDER BY archived_at DESC LIMIT ?",
+                (difficulty, limit)
+            ).fetchall()
+        else:
+            rows = conn.execute(
+                "SELECT * FROM archives ORDER BY archived_at DESC LIMIT ?", (limit,)
+            ).fetchall()
+        return [dict(r) for r in rows]
+
+
+def get_archive_count():
+    with db_session() as conn:
+        row = conn.execute("SELECT COUNT(*) as count FROM archives").fetchone()
+        return row["count"] if row else 0
+
+
+def delete_archive(archive_id):
+    with db_session() as conn:
+        conn.execute("DELETE FROM archives WHERE id = ?", (archive_id,))
 
 
 def get_stats(difficulty=None):

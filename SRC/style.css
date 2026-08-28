@@ -584,12 +584,26 @@ body {
     filter: drop-shadow(0 2px 6px rgba(168, 85, 247, 0.25));
 }
 
-.data-subtitle {
+.data-header-right {
+    display: flex;
+    flex-direction: column;
+    align-items: flex-end;
+    gap: 2px;
+}
+
+.data-count {
     font-size: 0.75rem;
     font-weight: 600;
     color: #475569;
     text-transform: uppercase;
     letter-spacing: 0.1em;
+}
+
+.data-arch-count {
+    font-size: 0.7rem;
+    font-weight: 700;
+    color: #34d399;
+    letter-spacing: 0.05em;
 }
 
 .data-table-wrap {
@@ -632,7 +646,7 @@ body {
 
 .data-table th.th-num { width: 40px; text-align: center; }
 .data-table th.th-score { text-align: center; }
-.data-table th.th-actions { text-align: center; width: 80px; }
+.data-table th.th-actions { text-align: center; width: 150px; }
 
 .data-table td {
     padding: 12px 14px;
@@ -747,6 +761,26 @@ body {
 
 .record-btn-delete:hover {
     background: rgba(239, 68, 68, 0.35);
+}
+
+.record-btn-save {
+    background: rgba(52, 211, 153, 0.15);
+    color: #34d399;
+    margin-right: 6px;
+}
+
+.record-btn-save:hover {
+    background: rgba(52, 211, 153, 0.35);
+}
+
+.record-btn-save.saved {
+    background: rgba(148, 163, 184, 0.12);
+    color: #64748b;
+    cursor: default;
+}
+
+.record-btn-save.saved:hover {
+    background: rgba(148, 163, 184, 0.12);
 }
 
 .record-btn:active {

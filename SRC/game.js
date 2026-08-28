@@ -179,6 +179,27 @@ class ScoreAPI {
             return false;
         }
     }
+
+    static async archiveScore(id) {
+        try {
+            const res = await fetch(`${ScoreAPI.BASE}/${id}/archive`, { method: 'POST' });
+            return await res.json();
+        } catch (e) {
+            console.warn('API archive failed:', e);
+            return { ok: false };
+        }
+    }
+
+    static async getArchives() {
+        try {
+            const res = await fetch('/api/archives');
+            const data = await res.json();
+            return data.archives || [];
+        } catch (e) {
+            console.warn('API archives get failed:', e);
+            return [];
+        }
+    }
 }
 
 // ===================== CONSTANTS =====================
@@ -700,9 +721,30 @@ class Game {
         });
     }
 
+    archiveGameplayRecord(id) {
+        ScoreAPI.archiveScore(id).then(res => {
+            if (res && res.ok) {
+                this.populateDataList();
+            } else {
+                alert("Could not save this flight record to the archives.");
+            }
+        });
+    }
+
     // ---- Data Screen ----
 
+    loadArchiveCount() {
+        fetch('/api/archives/count')
+            .then(res => res.json())
+            .then(data => {
+                const el = document.getElementById('data-arch-count');
+                if (el) el.textContent = `\u{1F4C2} ${data.count || 0} saved`;
+            })
+            .catch(() => {});
+    }
+
     populateDataList() {
+        this.loadArchiveCount();
         ScoreAPI.getScores().then(records => {
             const tbody = document.getElementById('data-tbody');
             const emptyMsg = document.getElementById('data-empty');
@@ -727,6 +769,8 @@ class Game {
                 const dateStr = date.toLocaleDateString(undefined, { month: 'short', day: 'numeric' });
                 const timeStr = date.toLocaleTimeString(undefined, { hour: '2-digit', minute: '2-digit' });
                 const highBadge = r.is_high ? '<span class="high-badge">HIGH</span>' : '';
+                const savedClass = r.archived ? ' saved' : '';
+                const savedLabel = r.archived ? 'Saved' : 'Save';
                 return `
                     <tr class="data-row" data-id="${r.id}">
                         <td class="td-num">${i + 1}</td>
@@ -735,6 +779,7 @@ class Game {
                         <td class="td-date">${dateStr} ${timeStr}</td>
                         <td class="td-actions">
                             <button class="record-btn record-btn-replay" data-action="replay" data-id="${r.id}">Replay</button>
+                            <button class="record-btn record-btn-save${savedClass}" data-action="save" data-id="${r.id}" ${r.archived ? 'disabled' : ''}>${savedLabel}</button>
                             <button class="record-btn record-btn-delete" data-action="delete" data-id="${r.id}">Del</button>
                         </td>
                     </tr>
@@ -747,6 +792,16 @@ class Game {
                     e.stopPropagation();
                     const id = parseInt(btn.getAttribute('data-id'), 10);
                     this.replayGame(id);
+                });
+            });
+
+            // Bind Save (Archive)
+            tbody.querySelectorAll('.record-btn-save').forEach(btn => {
+                btn.addEventListener('click', (e) => {
+                    e.stopPropagation();
+                    if (btn.classList.contains('saved')) return;
+                    const id = parseInt(btn.getAttribute('data-id'), 10);
+                    this.archiveGameplayRecord(id);
                 });
             });
 
