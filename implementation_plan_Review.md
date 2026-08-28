@@ -60,3 +60,8 @@ Please review the proposed plan structure in [Implementation_tasks_flappy.md](fi
 - **Pipe behavior**: Confirm random pipe generation within min/max height limits, and proper spacing.
 - **Collisions**: Verify collision triggers immediately when Faby hits a pipe or the ground.
 - **High Scores**: Verify high scores are saved locally and load correctly upon restart.
+
+Review paln 
+✅ I've reviewed the implementation plan.
+
+

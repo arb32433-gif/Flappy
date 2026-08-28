@@ -1,0 +1,329 @@
+{
+  "main": {
+    "id": "bc64e08fb7080355",
+    "type": "split",
+    "children": [
+      {
+        "id": "cd8257cf0353b223",
+        "type": "tabs",
+        "dimension": 50.44843049327354,
+        "children": [
+          {
+            "id": "a2dd4f9bb5f9ad85",
+            "type": "leaf",
+            "state": {
+              "type": "markdown",
+              "state": {
+                "file": "Document/Suggested_improvements_Flappy bird_game (SGIM-002).md",
+                "mode": "source",
+                "source": false
+              },
+              "icon": "lucide-file",
+              "title": "Suggested_improvements_Flappy bird_game (SGIM-002)"
+            }
+          },
+          {
+            "id": "49091641026cf4ab",
+            "type": "leaf",
+            "state": {
+              "type": "canvas",
+              "state": {
+                "file": "Untitled.canvas",
+                "viewState": {
+                  "x": 0,
+                  "y": 0,
+                  "zoom": -1
+                }
+              },
+              "icon": "lucide-layout-dashboard",
+              "title": "Untitled"
+            }
+          }
+        ],
+        "currentTab": 1
+      },
+      {
+        "id": "2b29e3d9b57a3728",
+        "type": "tabs",
+        "dimension": 49.55156950672646,
+        "children": [
+          {
+            "id": "6696f0afa6dfcc94",
+            "type": "leaf",
+            "state": {
+              "type": "markdown",
+              "state": {
+                "file": "Document/Tasks/Implementation_tasks_packaging.md",
+                "mode": "source",
+                "source": false
+              },
+              "icon": "lucide-file",
+              "title": "Implementation_tasks_packaging"
+            }
+          },
+          {
+            "id": "e289759cd85029ec",
+            "type": "leaf",
+            "state": {
+              "type": "markdown",
+              "state": {
+                "file": "Document/Tasks/Implementation_tasks_flappy.md",
+                "mode": "source",
+                "source": false
+              },
+              "icon": "lucide-file",
+              "title": "Implementation_tasks_flappy"
+            }
+          }
+        ]
+      }
+    ],
+    "direction": "vertical"
+  },
+  "left": {
+    "id": "e8dd7d665caa234d",
+    "type": "split",
+    "children": [
+      {
+        "id": "24187336cf6e8c52",
+        "type": "tabs",
+        "children": [
+          {
+            "id": "740bde710bd2de74",
+            "type": "leaf",
+            "state": {
+              "type": "file-explorer",
+              "state": {
+                "sortOrder": "alphabetical",
+                "autoReveal": false,
+                "showSearch": false,
+                "searchQuery": ""
+              },
+              "icon": "lucide-folder-closed",
+              "title": "Files"
+            }
+          },
+          {
+            "id": "20ba40f39880b47f",
+            "type": "leaf",
+            "state": {
+              "type": "search",
+              "state": {
+                "query": "",
+                "matchingCase": false,
+                "explainSearch": false,
+                "collapseAll": false,
+                "extraContext": false,
+                "sortOrder": "alphabetical"
+              },
+              "icon": "lucide-search",
+              "title": "Search"
+            }
+          },
+          {
+            "id": "9190f6b2bdbc4bcc",
+            "type": "leaf",
+            "state": {
+              "type": "bookmarks",
+              "state": {
+                "showSearch": false,
+                "searchQuery": ""
+              },
+              "icon": "lucide-bookmark",
+              "title": "Bookmarks"
+            }
+          },
+          {
+            "id": "658ba77b20002d30",
+            "type": "leaf",
+            "state": {
+              "type": "recent-files",
+              "state": {},
+              "icon": "clock",
+              "title": "Recent files"
+            }
+          }
+        ]
+      }
+    ],
+    "direction": "horizontal",
+    "width": 300
+  },
+  "right": {
+    "id": "812328eadb07b32c",
+    "type": "split",
+    "children": [
+      {
+        "id": "50c2d5b00da6603b",
+        "type": "tabs",
+        "children": [
+          {
+            "id": "b66ec63c090f6c6a",
+            "type": "leaf",
+            "state": {
+              "type": "backlink",
+              "state": {
+                "file": "Document/Plan/FLAPPY_BIRD_Planning.md",
+                "collapseAll": false,
+                "extraContext": false,
+                "sortOrder": "alphabetical",
+                "showSearch": false,
+                "searchQuery": "",
+                "backlinkCollapsed": false,
+                "unlinkedCollapsed": true
+              },
+              "icon": "links-coming-in",
+              "title": "Backlinks"
+            }
+          },
+          {
+            "id": "223fd49c698f4d35",
+            "type": "leaf",
+            "state": {
+              "type": "outgoing-link",
+              "state": {
+                "file": "Document/Plan/FLAPPY_BIRD_Planning.md",
+                "linksCollapsed": false,
+                "unlinkedCollapsed": true
+              },
+              "icon": "links-going-out",
+              "title": "Outgoing links"
+            }
+          },
+          {
+            "id": "8ed899b0fea1c7ee",
+            "type": "leaf",
+            "state": {
+              "type": "tag",
+              "state": {
+                "sortOrder": "frequency",
+                "useHierarchy": true,
+                "showSearch": false,
+                "searchQuery": ""
+              },
+              "icon": "lucide-tags",
+              "title": "Tags"
+            }
+          },
+          {
+            "id": "e431ff2f7b9c67ec",
+            "type": "leaf",
+            "state": {
+              "type": "all-properties",
+              "state": {
+                "sortOrder": "frequency",
+                "showSearch": false,
+                "searchQuery": ""
+              },
+              "icon": "lucide-archive",
+              "title": "All properties"
+            }
+          },
+          {
+            "id": "c6efb501f4f9c8cf",
+            "type": "leaf",
+            "state": {
+              "type": "outline",
+              "state": {
+                "file": "Document/Plan/FLAPPY_BIRD_Planning.md",
+                "followCursor": false,
+                "showSearch": false,
+                "searchQuery": ""
+              },
+              "icon": "lucide-list",
+              "title": "Outline"
+            }
+          },
+          {
+            "id": "237bcadf22a8cd9f",
+            "type": "leaf",
+            "state": {
+              "type": "copilot-agent-chat-view",
+              "state": {},
+              "icon": "copilot-agent",
+              "title": "Copilot Agent"
+            }
+          },
+          {
+            "id": "822aaf8cea2d5e00",
+            "type": "leaf",
+            "state": {
+              "type": "smart-connections-view",
+              "state": {},
+              "icon": "smart-connections",
+              "title": "Connections"
+            }
+          }
+        ],
+        "currentTab": 5
+      }
+    ],
+    "direction": "horizontal",
+    "width": 300
+  },
+  "left-ribbon": {
+    "hiddenItems": {
+      "switcher:Open quick switcher": false,
+      "graph:Open graph view": false,
+      "canvas:Create new canvas": false,
+      "daily-notes:Open today's daily note": false,
+      "templates:Insert template": false,
+      "command-palette:Open command palette": false,
+      "bases:Create new base": false,
+      "copilot:Open Copilot Agent Chat": false,
+      "smart-connections:Smart Connections: Open random connection": false,
+      "smart-connections:Smart Connections: Open connections view": false,
+      "smart-connections:Toggle Footer Connections": false
+    }
+  },
+  "active": "49091641026cf4ab",
+  "lastOpenFiles": [
+    ".git/objects/8e",
+    ".git/objects/2b",
+    ".git/objects/23",
+    ".git/objects/11",
+    ".git/objects/14",
+    ".git/objects/2d",
+    ".git/objects/c9",
+    ".git/objects/44",
+    ".git/objects/ab",
+    ".git/objects/95",
+    ".git/objects/8a",
+    "2026-08-28.md",
+    "Untitled.canvas",
+    "Document/Tasks/Implementation_tasks_flappy.md",
+    "implementation_plan_Review.md",
+    "Document/Tasks/Implementation_tasks_packaging.md",
+    "src-tauri/icons/android/mipmap-xxxhdpi/ic_launcher.png",
+    "src-tauri/icons/android/mipmap-xxxhdpi/ic_launcher_round.png",
+    "src-tauri/icons/android/mipmap-xxhdpi/ic_launcher.png",
+    "src-tauri/icons/android/mipmap-xxhdpi/ic_launcher_round.png",
+    "src-tauri/icons/android/mipmap-xhdpi/ic_launcher.png",
+    "src-tauri/icons/android/mipmap-xhdpi/ic_launcher_round.png",
+    "src-tauri/icons/android/mipmap-mdpi/ic_launcher.png",
+    "src-tauri/icons/android/mipmap-mdpi/ic_launcher_round.png",
+    "src-tauri/icons/android/mipmap-hdpi/ic_launcher.png",
+    "src-tauri/icons/android/mipmap-hdpi/ic_launcher_round.png",
+    "node_modules/@tauri-apps/cli/README.md",
+    "node_modules/@tauri-apps/cli/CHANGELOG.md",
+    "node_modules/@tauri-apps/cli-win32-x64-msvc/README.md",
+    "Document/Suggested_improvements_Flappy bird_game (SGIM-001).md",
+    "Document/Plan/Tauri_packaging_implementation_plan.md",
+    "Document/Plan/FLAPPY_BIRD_Planning.md",
+    "Document/Suggested_Improvements_Flappy bird_game (SGIM-003).md",
+    "copilot/copilot-conversations/agent__Kindly_improve_this@20260828_032103.md",
+    "Document/Suggested_improvements_Flappy bird_game (SGIM-002).md",
+    "Document/implementation_plan_Review.md",
+    "Untitled 1.md",
+    "Document/Plan/implementation_plan.md",
+    ".opencode/node_modules/@msgpackr-extract/msgpackr-extract-win32-x64/README.md",
+    ".opencode/node_modules/@standard-schema/spec/README.md",
+    ".opencode/node_modules/@ai-sdk/provider/README.md",
+    ".opencode/node_modules/@ai-sdk/provider/CHANGELOG.md",
+    ".opencode/node_modules/uuid/README.md",
+    ".opencode/node_modules/uuid/LICENSE.md",
+    ".opencode/node_modules/yaml/README.md",
+    ".opencode/node_modules/toml/README.md",
+    ".opencode/node_modules/zod/README.md"
+  ]
+}

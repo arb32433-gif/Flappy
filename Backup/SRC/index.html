@@ -1,0 +1,67 @@
+<!DOCTYPE html>
+<html lang="en">
+<head>
+    <meta charset="UTF-8">
+    <meta name="viewport" content="width=device-width, initial-scale=1.0">
+    <title>Faby's Flight - Event-Driven Flappy Bird</title>
+    <link rel="stylesheet" href="style.css">
+    <!-- Import Outfit font from Google Fonts for a premium look -->
+    <link href="https://fonts.googleapis.com/css2?family=Outfit:wght@400;600;800&display=swap" rel="stylesheet">
+</head>
+<body>
+    <div id="game-container">
+        <!-- Canvas for drawing game elements -->
+        <canvas id="game-canvas" width="400" height="600"></canvas>
+
+        <!-- HUD (Heads-Up Display) for real-time score -->
+        <div id="hud" class="hud-hidden">
+            <span id="score-display">0</span>
+            <div id="hud-diff">Medium</div>
+        </div>
+
+        <!-- Start Screen Overlay -->
+        <div id="start-screen" class="overlay">
+            <h1 class="game-title">FABY'S FLIGHT</h1>
+            <p class="game-subtitle">An Event-Driven Classic</p>
+            
+            <!-- Difficulty Selector -->
+            <div class="difficulty-container">
+                <span class="difficulty-label">Difficulty</span>
+                <div class="difficulty-buttons">
+                    <button class="diff-btn" data-diff="easy">Easy</button>
+                    <button class="diff-btn active" data-diff="medium">Medium</button>
+                    <button class="diff-btn" data-diff="hard">Hard</button>
+                </div>
+            </div>
+
+            <div class="instructions-box">
+                <p>Press <span class="key-badge">SPACE</span> or <span class="key-badge">CLICK</span> to flap.</p>
+                <p>Navigate through the gaps without crashing!</p>
+            </div>
+            <button id="start-btn" class="btn">Start Game</button>
+        </div>
+
+        <!-- Game Over Screen Overlay -->
+        <div id="game-over-screen" class="overlay hidden">
+            <h2 class="game-over-title">GAME OVER</h2>
+            <div class="score-board">
+                <div class="score-row">
+                    <span>Difficulty:</span>
+                    <span id="game-over-diff" class="score-val" style="font-size: 1.1rem; color: #38bdf8;">Medium</span>
+                </div>
+                <div class="score-row">
+                    <span>Score:</span>
+                    <span id="final-score" class="score-val">0</span>
+                </div>
+                <div class="score-row">
+                    <span>Best Score:</span>
+                    <span id="high-score" class="score-val">0</span>
+                </div>
+            </div>
+            <button id="restart-btn" class="btn">Play Again</button>
+        </div>
+    </div>
+
+    <script src="game.js"></script>
+</body>
+</html>

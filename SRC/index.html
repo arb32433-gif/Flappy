@@ -3,36 +3,160 @@
 <head>
     <meta charset="UTF-8">
     <meta name="viewport" content="width=device-width, initial-scale=1.0">
-    <title>Faby's Flight - Event-Driven Flappy Bird</title>
+    <title>flappyflight - Event-Driven Flappy Bird</title>
     <link rel="stylesheet" href="style.css">
-    <!-- Import Outfit font from Google Fonts for a premium look -->
-    <link href="https://fonts.googleapis.com/css2?family=Outfit:wght@400;600;800&display=swap" rel="stylesheet">
+    <link rel="preload" href="fonts/outfit-latin.woff2" as="font" type="font/woff2" crossorigin>
 </head>
 <body>
     <div id="game-container">
-        <!-- Canvas for drawing game elements -->
         <canvas id="game-canvas" width="400" height="600"></canvas>
 
-        <!-- HUD (Heads-Up Display) for real-time score -->
+        <!-- HUD -->
         <div id="hud" class="hud-hidden">
             <span id="score-display">0</span>
+            <div id="hud-diff">Medium</div>
         </div>
 
-        <!-- Start Screen Overlay -->
-        <div id="start-screen" class="overlay">
-            <h1 class="game-title">FABY'S FLIGHT</h1>
-            <p class="game-subtitle">An Event-Driven Classic</p>
-            <div class="instructions-box">
-                <p>Press <span class="key-badge">SPACE</span> or <span class="key-badge">CLICK</span> to flap.</p>
-                <p>Navigate through the gaps without crashing!</p>
+        <!-- Main Menu / Dashboard -->
+        <div id="main-menu" class="overlay">
+            <div class="menu-dashboard">
+                <div class="dashboard-header">
+                    <h1 class="game-title">FLAPPYFLIGHT</h1>
+                    <p class="game-subtitle">Event-Driven Premium Edition</p>
+                </div>
+                
+                <div class="dashboard-grid">
+                    <!-- Left Section: Play controls, difficulty, audio settings -->
+                    <div class="dashboard-col left-col">
+                        <!-- Difficulty Selector -->
+                        <div class="difficulty-section">
+                            <span class="section-title">Difficulty Mode</span>
+                            <div class="difficulty-segmented-control">
+                                <button class="diff-select-btn" data-diff="easy">Easy</button>
+                                <button class="diff-select-btn active" data-diff="medium">Medium</button>
+                                <button class="diff-select-btn" data-diff="hard">Hard</button>
+                            </div>
+                        </div>
+
+                        <!-- Audio Toggle -->
+                        <div class="settings-section">
+                            <div class="setting-row">
+                                <span class="setting-label">Audio Effects</span>
+                                <button id="sound-toggle-btn" class="sound-toggle-btn" title="Toggle Sound">
+                                    <span class="sound-icon">&#128266;</span>
+                                    <span class="sound-status">ON</span>
+                                </button>
+                            </div>
+                        </div>
+
+                        <!-- Game Controls -->
+                        <nav class="menu-nav">
+                            <button id="new-game-btn" class="menu-btn menu-btn-new">
+                                <span class="menu-btn-icon">&#9654;</span>
+                                <span class="menu-btn-label">Launch Flight</span>
+                                <span class="menu-btn-hint">Start a fresh flight</span>
+                            </button>
+                            <button id="resume-btn" class="menu-btn menu-btn-resume" disabled>
+                                <span class="menu-btn-icon">&#8635;</span>
+                                <span class="menu-btn-label">Resume Flight</span>
+                                <span class="menu-btn-hint">Continue from save</span>
+                            </button>
+                            <button id="data-btn" class="menu-btn menu-btn-data">
+                                <span class="menu-btn-icon">&#9776;</span>
+                                <span class="menu-btn-label">Flight Logs</span>
+                                <span class="menu-btn-hint">History & Replays</span>
+                            </button>
+                        </nav>
+                    </div>
+
+                    <!-- Right Section: Skin selector and Live Stats -->
+                    <div class="dashboard-col right-col">
+                        <!-- Skin Selector -->
+                        <div class="skin-section">
+                            <span class="section-title">Custom bird Skin</span>
+                            <div class="skin-preview-wrapper">
+                                <canvas id="skin-preview-canvas" width="120" height="70"></canvas>
+                            </div>
+                            <div class="skin-grid">
+                                <button class="skin-btn active" data-skin="gold" title="Classic Gold">
+                                    <span class="skin-dot skin-dot-gold"></span>
+                                    Gold
+                                </button>
+                                <button class="skin-btn" data-skin="neon" title="Neon Cyber">
+                                    <span class="skin-dot skin-dot-neon"></span>
+                                    Cyber
+                                </button>
+                                <button class="skin-btn" data-skin="ruby" title="Ruby Fire">
+                                    <span class="skin-dot skin-dot-ruby"></span>
+                                    Ruby
+                                </button>
+                                <button class="skin-btn" data-skin="emerald" title="Emerald Wind">
+                                    <span class="skin-dot skin-dot-emerald"></span>
+                                    Emerald
+                                </button>
+                            </div>
+                        </div>
+
+                        <!-- Live Stats Card -->
+                        <div class="stats-section">
+                            <span class="section-title">Personal Records</span>
+                            <div class="stats-card">
+                                <div class="stat-item">
+                                    <span class="stat-label">Best Score</span>
+                                    <span id="stat-high" class="stat-value text-amber">0</span>
+                                </div>
+                                <div class="stat-divider"></div>
+                                <div class="stat-item">
+                                    <span class="stat-label">Total Flights</span>
+                                    <span id="stat-total" class="stat-value text-blue">0</span>
+                                </div>
+                                <div class="stat-divider"></div>
+                                <div class="stat-item">
+                                    <span class="stat-label">Avg Score</span>
+                                    <span id="stat-avg" class="stat-value text-green">0</span>
+                                </div>
+                            </div>
+                        </div>
+                    </div>
+                </div>
             </div>
-            <button id="start-btn" class="btn">Start Game</button>
         </div>
 
-        <!-- Game Over Screen Overlay -->
+        <!-- Data Screen -->
+        <div id="data-screen" class="overlay hidden">
+            <div class="data-glass">
+                <div class="data-header">
+                    <h2 class="data-title">FLIGHT HISTORY LOGS</h2>
+                    <p class="data-subtitle" id="data-count">0 records</p>
+                </div>
+                <div class="data-table-wrap">
+                    <table class="data-table">
+                        <thead>
+                            <tr>
+                                <th class="th-num">#</th>
+                                <th class="th-diff">Difficulty</th>
+                                <th class="th-score">Score</th>
+                                <th class="th-date">Date</th>
+                                <th class="th-actions">Actions</th>
+                            </tr>
+                        </thead>
+                        <tbody id="data-tbody">
+                        </tbody>
+                    </table>
+                    <p class="data-empty" id="data-empty">No flight logs yet. Start a new game to begin recording!</p>
+                </div>
+                <button id="data-back-btn" class="btn btn-back">Back to Menu</button>
+            </div>
+        </div>
+
+        <!-- Game Over Screen -->
         <div id="game-over-screen" class="overlay hidden">
-            <h2 class="game-over-title">GAME OVER</h2>
+            <h2 class="game-over-title">FLIGHT CRASHED</h2>
             <div class="score-board">
+                <div class="score-row">
+                    <span>Difficulty:</span>
+                    <span id="game-over-diff" class="score-val" style="font-size: 1.1rem; color: #38bdf8;">Medium</span>
+                </div>
                 <div class="score-row">
                     <span>Score:</span>
                     <span id="final-score" class="score-val">0</span>
@@ -42,7 +166,8 @@
                     <span id="high-score" class="score-val">0</span>
                 </div>
             </div>
-            <button id="restart-btn" class="btn">Play Again</button>
+            <button id="restart-btn" class="btn">Fly Again</button>
+            <button id="go-menu-btn" class="btn btn-back" style="margin-top: 12px;">Main Menu</button>
         </div>
     </div>
 

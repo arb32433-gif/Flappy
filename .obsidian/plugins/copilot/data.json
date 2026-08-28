@@ -1,0 +1,926 @@
+{
+  "userId": "b317b3e6-1a96-441a-9715-89d610f52248",
+  "isPaidUser": false,
+  "isPlusUser": false,
+  "entitlementToken": "",
+  "entitlementExpiresAt": 0,
+  "plusLicenseKey": "",
+  "openAIApiKey": "",
+  "openAIOrgId": "",
+  "huggingfaceApiKey": "",
+  "cohereApiKey": "",
+  "anthropicApiKey": "",
+  "googleApiKey": "",
+  "openRouterAiApiKey": "",
+  "xaiApiKey": "",
+  "mistralApiKey": "",
+  "deepseekApiKey": "",
+  "siliconflowApiKey": "",
+  "defaultChainType": "llm_chain",
+  "defaultModelKey": "google/gemini-2.5-flash|openrouterai",
+  "embeddingModelKey": "openai/text-embedding-3-small|openrouterai",
+  "contextTurns": 15,
+  "userSystemPrompt": "",
+  "openAIProxyBaseUrl": "",
+  "openAIEmbeddingProxyBaseUrl": "",
+  "stream": true,
+  "copilotFolder": "copilot",
+  "copilotRootHistory": [
+    "copilot"
+  ],
+  "upgradedToV8FromLegacy": false,
+  "defaultSaveFolder": "copilot/copilot-conversations",
+  "defaultConversationTag": "copilot-conversation",
+  "autosaveChat": true,
+  "autoAddActiveContentToContext": true,
+  "defaultOpenArea": "view",
+  "defaultSendShortcut": "enter",
+  "customPromptsFolder": "copilot/copilot-custom-prompts",
+  "indexVaultToVectorStore": "ON MODE SWITCH",
+  "qaExclusions": "copilot",
+  "qaInclusions": "",
+  "chatNoteContextPath": "",
+  "chatNoteContextTags": [],
+  "enableIndexSync": true,
+  "debug": false,
+  "maxSourceChunks": 30,
+  "enableInlineCitations": true,
+  "groqApiKey": "",
+  "activeModels": [
+    {
+      "name": "copilot-plus-flash",
+      "provider": "copilot-plus",
+      "enabled": true,
+      "isBuiltIn": true,
+      "core": true,
+      "plusExclusive": true,
+      "capabilities": [
+        "vision"
+      ],
+      "apiKey": ""
+    },
+    {
+      "name": "google/gemini-2.5-flash",
+      "provider": "openrouterai",
+      "enabled": true,
+      "isBuiltIn": true,
+      "core": true,
+      "capabilities": [
+        "vision"
+      ],
+      "apiKey": ""
+    },
+    {
+      "name": "gpt-5.5",
+      "provider": "openai",
+      "enabled": true,
+      "isBuiltIn": true,
+      "core": true,
+      "capabilities": [
+        "vision"
+      ],
+      "apiKey": ""
+    },
+    {
+      "name": "gpt-5.4-mini",
+      "provider": "openai",
+      "enabled": true,
+      "isBuiltIn": true,
+      "core": true,
+      "capabilities": [
+        "vision"
+      ],
+      "apiKey": ""
+    },
+    {
+      "name": "google/gemini-3.5-flash",
+      "provider": "openrouterai",
+      "enabled": true,
+      "isBuiltIn": true,
+      "capabilities": [
+        "vision",
+        "reasoning"
+      ],
+      "apiKey": ""
+    },
+    {
+      "name": "claude-sonnet-4-6",
+      "provider": "anthropic",
+      "enabled": true,
+      "isBuiltIn": true,
+      "capabilities": [
+        "vision",
+        "reasoning"
+      ],
+      "apiKey": ""
+    },
+    {
+      "name": "gemini-3.5-flash",
+      "provider": "google",
+      "enabled": true,
+      "isBuiltIn": true,
+      "capabilities": [
+        "vision",
+        "reasoning"
+      ],
+      "apiKey": ""
+    },
+    {
+      "name": "gemini-3.1-flash-lite",
+      "provider": "google",
+      "enabled": true,
+      "isBuiltIn": true,
+      "capabilities": [
+        "vision"
+      ],
+      "apiKey": ""
+    },
+    {
+      "name": "gemini-2.5-flash",
+      "provider": "google",
+      "enabled": true,
+      "isBuiltIn": true,
+      "capabilities": [
+        "vision"
+      ],
+      "apiKey": ""
+    },
+    {
+      "name": "google/gemini-3.1-pro-preview",
+      "provider": "openrouterai",
+      "enabled": false,
+      "isBuiltIn": true,
+      "capabilities": [
+        "vision",
+        "reasoning"
+      ],
+      "apiKey": ""
+    },
+    {
+      "name": "google/gemini-2.5-pro",
+      "provider": "openrouterai",
+      "enabled": false,
+      "isBuiltIn": true,
+      "core": false,
+      "capabilities": [
+        "vision"
+      ],
+      "apiKey": ""
+    },
+    {
+      "name": "openai/gpt-5.5",
+      "provider": "openrouterai",
+      "enabled": false,
+      "isBuiltIn": true,
+      "core": false,
+      "capabilities": [
+        "vision"
+      ],
+      "apiKey": ""
+    },
+    {
+      "name": "openai/gpt-5.4-mini",
+      "provider": "openrouterai",
+      "enabled": false,
+      "isBuiltIn": true,
+      "core": false,
+      "capabilities": [
+        "vision"
+      ],
+      "apiKey": ""
+    },
+    {
+      "name": "grok-4.3",
+      "provider": "xai",
+      "enabled": false,
+      "isBuiltIn": true,
+      "core": false,
+      "capabilities": [
+        "vision"
+      ],
+      "apiKey": ""
+    },
+    {
+      "name": "x-ai/grok-4.3",
+      "provider": "openrouterai",
+      "enabled": false,
+      "isBuiltIn": true,
+      "core": false,
+      "capabilities": [
+        "vision"
+      ],
+      "apiKey": ""
+    },
+    {
+      "name": "gpt-4.1",
+      "provider": "openai",
+      "enabled": false,
+      "isBuiltIn": true,
+      "core": false,
+      "capabilities": [
+        "vision"
+      ],
+      "apiKey": ""
+    },
+    {
+      "name": "gpt-4.1-mini",
+      "provider": "openai",
+      "enabled": false,
+      "isBuiltIn": true,
+      "core": false,
+      "capabilities": [
+        "vision"
+      ],
+      "apiKey": ""
+    },
+    {
+      "name": "claude-opus-4-7",
+      "provider": "anthropic",
+      "enabled": false,
+      "isBuiltIn": true,
+      "capabilities": [
+        "vision",
+        "reasoning"
+      ],
+      "apiKey": ""
+    },
+    {
+      "name": "claude-haiku-4-5",
+      "provider": "anthropic",
+      "enabled": false,
+      "isBuiltIn": true,
+      "capabilities": [
+        "vision",
+        "reasoning"
+      ],
+      "apiKey": ""
+    },
+    {
+      "name": "gemini-3.1-pro-preview",
+      "provider": "google",
+      "enabled": false,
+      "isBuiltIn": true,
+      "capabilities": [
+        "vision",
+        "reasoning"
+      ],
+      "apiKey": ""
+    },
+    {
+      "name": "gemini-2.5-pro",
+      "provider": "google",
+      "enabled": false,
+      "isBuiltIn": true,
+      "capabilities": [
+        "vision"
+      ],
+      "apiKey": ""
+    },
+    {
+      "name": "deepseek-chat",
+      "provider": "deepseek",
+      "enabled": false,
+      "isBuiltIn": true,
+      "apiKey": ""
+    },
+    {
+      "name": "deepseek-reasoner",
+      "provider": "deepseek",
+      "enabled": false,
+      "isBuiltIn": true,
+      "capabilities": [
+        "reasoning"
+      ],
+      "apiKey": ""
+    },
+    {
+      "name": "deepseek-ai/DeepSeek-V3",
+      "provider": "siliconflow",
+      "enabled": false,
+      "isBuiltIn": false,
+      "baseUrl": "https://api.siliconflow.com/v1",
+      "apiKey": ""
+    },
+    {
+      "name": "deepseek-ai/DeepSeek-R1",
+      "provider": "siliconflow",
+      "enabled": false,
+      "isBuiltIn": false,
+      "baseUrl": "https://api.siliconflow.com/v1",
+      "capabilities": [
+        "reasoning"
+      ],
+      "apiKey": ""
+    }
+  ],
+  "activeEmbeddingModels": [
+    {
+      "name": "copilot-plus-small",
+      "provider": "copilot-plus",
+      "enabled": true,
+      "isBuiltIn": true,
+      "isEmbeddingModel": true,
+      "core": true,
+      "plusExclusive": true,
+      "apiKey": ""
+    },
+    {
+      "name": "copilot-plus-large",
+      "provider": "copilot-plus-jina",
+      "enabled": true,
+      "isBuiltIn": true,
+      "isEmbeddingModel": true,
+      "core": true,
+      "plusExclusive": true,
+      "believerExclusive": true,
+      "dimensions": 1024,
+      "apiKey": ""
+    },
+    {
+      "name": "copilot-plus-multilingual",
+      "provider": "copilot-plus-jina",
+      "enabled": true,
+      "isBuiltIn": true,
+      "isEmbeddingModel": true,
+      "core": true,
+      "plusExclusive": true,
+      "dimensions": 512,
+      "apiKey": ""
+    },
+    {
+      "name": "openai/text-embedding-3-small",
+      "provider": "openrouterai",
+      "enabled": true,
+      "isBuiltIn": true,
+      "isEmbeddingModel": true,
+      "core": true,
+      "apiKey": ""
+    },
+    {
+      "name": "text-embedding-3-small",
+      "provider": "openai",
+      "enabled": true,
+      "isBuiltIn": true,
+      "isEmbeddingModel": true,
+      "core": true,
+      "apiKey": ""
+    },
+    {
+      "name": "gemini-embedding-001",
+      "provider": "google",
+      "enabled": true,
+      "isBuiltIn": true,
+      "isEmbeddingModel": true,
+      "core": true,
+      "apiKey": ""
+    },
+    {
+      "name": "gemini-embedding-2-preview",
+      "provider": "google",
+      "enabled": true,
+      "isBuiltIn": true,
+      "isEmbeddingModel": true,
+      "core": true,
+      "apiKey": ""
+    },
+    {
+      "name": "Qwen/Qwen3-Embedding-0.6B",
+      "provider": "siliconflow",
+      "enabled": true,
+      "isBuiltIn": true,
+      "isEmbeddingModel": true,
+      "core": true,
+      "baseUrl": "https://api.siliconflow.com/v1",
+      "apiKey": ""
+    },
+    {
+      "name": "text-embedding-3-large",
+      "provider": "openai",
+      "enabled": true,
+      "isBuiltIn": true,
+      "isEmbeddingModel": true,
+      "apiKey": ""
+    },
+    {
+      "name": "embed-multilingual-light-v3.0",
+      "provider": "cohereai",
+      "enabled": true,
+      "isBuiltIn": true,
+      "isEmbeddingModel": true,
+      "apiKey": ""
+    },
+    {
+      "name": "text-embedding-004",
+      "provider": "google",
+      "enabled": true,
+      "isBuiltIn": true,
+      "isEmbeddingModel": true,
+      "apiKey": ""
+    }
+  ],
+  "embeddingRequestsPerMin": 60,
+  "embeddingBatchSize": 16,
+  "disableIndexOnMobile": true,
+  "numPartitions": 1,
+  "lexicalSearchRamLimit": 100,
+  "promptUsageTimestamps": {},
+  "promptSortStrategy": "timestamp",
+  "chatHistorySortStrategy": "recent",
+  "projectsFolder": "copilot/projects",
+  "defaultConversationNoteName": "{$topic}@{$date}_{$time}",
+  "inlineEditCommands": [],
+  "projectList": [],
+  "lastDismissedVersion": null,
+  "passMarkdownImages": true,
+  "enableAutonomousAgent": true,
+  "enableCustomPromptTemplating": true,
+  "enableSemanticSearchV3": false,
+  "enableSelfHostMode": false,
+  "enableMiyo": false,
+  "enableMiyoSearchSkill": false,
+  "miyoSearchAll": false,
+  "miyoServerUrl": "",
+  "miyoSyncedExclusions": "",
+  "selfHostSearchProvider": "firecrawl",
+  "firecrawlApiKey": "",
+  "perplexityApiKey": "",
+  "parallelApiKey": "",
+  "exaApiKey": "",
+  "supadataApiKey": "",
+  "docProcessorBackend": "plus",
+  "enableLexicalBoosts": true,
+  "suggestedDefaultCommands": false,
+  "autonomousAgentMaxIterations": 4,
+  "autonomousAgentEnabledToolIds": [
+    "localSearch",
+    "readNote",
+    "webSearch",
+    "pomodoro",
+    "youtubeTranscription",
+    "writeFile",
+    "editFile",
+    "updateMemory"
+  ],
+  "reasoningEffort": "low",
+  "verbosity": "medium",
+  "memoryFolderName": "copilot/memory",
+  "enableRecentConversations": true,
+  "maxRecentConversations": 30,
+  "enableSavedMemory": true,
+  "quickCommandIncludeNoteContext": true,
+  "autoIncludeTextSelection": false,
+  "autoAddSelectionToContext": false,
+  "autoAcceptEdits": false,
+  "diffViewMode": "split",
+  "userSystemPromptsFolder": "copilot/system-prompts",
+  "defaultSystemPromptTitle": "",
+  "autoCompactThreshold": 128000,
+  "convertedDocOutputFolder": "",
+  "agentMode": {
+    "byok": {},
+    "activeBackend": "opencode",
+    "backends": {
+      "opencode": {
+        "defaultMode": "default"
+      }
+    },
+    "debugFullFrames": true,
+    "welcomeDismissed": false,
+    "skills": {
+      "folder": "copilot/skills"
+    },
+    "deviceProfiles": {
+      "43101dbd-fd6c-4d50-b878-1fb1f7e0191b": {
+        "opencode": {
+          "binaryPath": "C:\\Users\\Ghing\\.obsidian-copilot\\opencode\\1.18.16\\bin\\opencode.exe",
+          "binaryVersion": "1.18.16",
+          "binarySource": "managed",
+          "probeSessionId": "ses_fbd88abd3ffekG6MK4BHn4wh7o"
+        }
+      }
+    }
+  },
+  "providers": {
+    "96c05c4a-47c2-4b03-8490-953887716b09": {
+      "providerType": "openai-compatible",
+      "displayName": "opencode",
+      "origin": {
+        "kind": "agent",
+        "agentType": "opencode"
+      },
+      "requiresApiKey": false,
+      "providerId": "96c05c4a-47c2-4b03-8490-953887716b09",
+      "addedAt": 1787821511758,
+      "apiKeyKeychainId": null
+    }
+  },
+  "configuredModels": [
+    {
+      "providerId": "96c05c4a-47c2-4b03-8490-953887716b09",
+      "info": {
+        "id": "google/deep-research-max-preview-04-2026",
+        "displayName": "Google/Deep Research Max Preview (Apr-21-2026)"
+      },
+      "configuredModelId": "179ce0ae-aab1-4751-ac3a-bfa74a47fa28",
+      "configuredAt": 1787821516797
+    },
+    {
+      "providerId": "96c05c4a-47c2-4b03-8490-953887716b09",
+      "info": {
+        "id": "google/deep-research-preview-04-2026",
+        "displayName": "Google/Deep Research Preview (Apr-21-2026)"
+      },
+      "configuredModelId": "58f4dc7c-0581-47c0-bf38-d7f39066ff01",
+      "configuredAt": 1787821516809
+    },
+    {
+      "providerId": "96c05c4a-47c2-4b03-8490-953887716b09",
+      "info": {
+        "id": "google/gemini-2.5-computer-use-preview-10-2025",
+        "displayName": "Google/Gemini 2.5 Computer Use Preview 10-2025"
+      },
+      "configuredModelId": "842d1f87-db8e-47f7-895b-56c07fc6bf4c",
+      "configuredAt": 1787821516831
+    },
+    {
+      "providerId": "96c05c4a-47c2-4b03-8490-953887716b09",
+      "info": {
+        "id": "google/gemini-2.5-flash",
+        "displayName": "Google/Gemini 2.5 Flash"
+      },
+      "configuredModelId": "cf77a1b2-798a-49b1-978e-2c7d8e2a2aec",
+      "configuredAt": 1787821516839
+    },
+    {
+      "providerId": "96c05c4a-47c2-4b03-8490-953887716b09",
+      "info": {
+        "id": "google/gemini-2.5-flash-preview-tts",
+        "displayName": "Google/Gemini 2.5 Flash Preview TTS"
+      },
+      "configuredModelId": "8e351e22-1316-47f8-96d1-a252b103db5b",
+      "configuredAt": 1787821516840
+    },
+    {
+      "providerId": "96c05c4a-47c2-4b03-8490-953887716b09",
+      "info": {
+        "id": "google/gemini-2.5-flash-lite",
+        "displayName": "Google/Gemini 2.5 Flash-Lite"
+      },
+      "configuredModelId": "5eba936c-c879-46c5-8de8-047468c0cb12",
+      "configuredAt": 1787821516841
+    },
+    {
+      "providerId": "96c05c4a-47c2-4b03-8490-953887716b09",
+      "info": {
+        "id": "google/gemini-2.5-pro",
+        "displayName": "Google/Gemini 2.5 Pro"
+      },
+      "configuredModelId": "e8b47f86-2825-438d-b961-8fa3e78d43f3",
+      "configuredAt": 1787821516842
+    },
+    {
+      "providerId": "96c05c4a-47c2-4b03-8490-953887716b09",
+      "info": {
+        "id": "google/gemini-2.5-pro-preview-tts",
+        "displayName": "Google/Gemini 2.5 Pro Preview TTS"
+      },
+      "configuredModelId": "ecd505af-d338-4b0f-89a9-c5d5d6a6f2ba",
+      "configuredAt": 1787821516842
+    },
+    {
+      "providerId": "96c05c4a-47c2-4b03-8490-953887716b09",
+      "info": {
+        "id": "google/gemini-3-flash-preview",
+        "displayName": "Google/Gemini 3 Flash Preview"
+      },
+      "configuredModelId": "09121ac9-f92a-452f-b219-6def34e0ef3d",
+      "configuredAt": 1787821516843
+    },
+    {
+      "providerId": "96c05c4a-47c2-4b03-8490-953887716b09",
+      "info": {
+        "id": "google/gemini-3.1-flash-lite",
+        "displayName": "Google/Gemini 3.1 Flash Lite"
+      },
+      "configuredModelId": "6237a743-6edd-4e58-b273-cf7374055e66",
+      "configuredAt": 1787821516844
+    },
+    {
+      "providerId": "96c05c4a-47c2-4b03-8490-953887716b09",
+      "info": {
+        "id": "google/gemini-3.1-flash-live-preview",
+        "displayName": "Google/Gemini 3.1 Flash Live Preview"
+      },
+      "configuredModelId": "de3056f6-c98f-4aa3-a164-7233e184d18c",
+      "configuredAt": 1787821516845
+    },
+    {
+      "providerId": "96c05c4a-47c2-4b03-8490-953887716b09",
+      "info": {
+        "id": "google/gemini-3.1-flash-tts-preview",
+        "displayName": "Google/Gemini 3.1 Flash TTS Preview"
+      },
+      "configuredModelId": "fbf5e38b-2975-4d6d-ba8d-2d984f87e036",
+      "configuredAt": 1787821516845
+    },
+    {
+      "providerId": "96c05c4a-47c2-4b03-8490-953887716b09",
+      "info": {
+        "id": "google/gemini-3.1-pro-preview",
+        "displayName": "Google/Gemini 3.1 Pro Preview"
+      },
+      "configuredModelId": "9769c6f8-b5d2-4829-8065-8e4125c35096",
+      "configuredAt": 1787821516846
+    },
+    {
+      "providerId": "96c05c4a-47c2-4b03-8490-953887716b09",
+      "info": {
+        "id": "google/gemini-3.1-pro-preview-customtools",
+        "displayName": "Google/Gemini 3.1 Pro Preview Custom Tools"
+      },
+      "configuredModelId": "248be849-60be-4998-84c1-b21d9777ba37",
+      "configuredAt": 1787821516847
+    },
+    {
+      "providerId": "96c05c4a-47c2-4b03-8490-953887716b09",
+      "info": {
+        "id": "google/gemini-3.5-flash",
+        "displayName": "Google/Gemini 3.5 Flash"
+      },
+      "configuredModelId": "3599ba03-d5fa-4dcb-b753-4253cc848c35",
+      "configuredAt": 1787821516848
+    },
+    {
+      "providerId": "96c05c4a-47c2-4b03-8490-953887716b09",
+      "info": {
+        "id": "google/gemini-3.5-flash-lite",
+        "displayName": "Google/Gemini 3.5 Flash Lite"
+      },
+      "configuredModelId": "91f83a85-94ac-4b8e-9d4a-afc8aeaa254c",
+      "configuredAt": 1787821516848
+    },
+    {
+      "providerId": "96c05c4a-47c2-4b03-8490-953887716b09",
+      "info": {
+        "id": "google/gemini-3.5-live-translate-preview",
+        "displayName": "Google/Gemini 3.5 Live Translate Preview"
+      },
+      "configuredModelId": "14c9e190-e2ba-4199-828a-caaf8c9ccda6",
+      "configuredAt": 1787821516849
+    },
+    {
+      "providerId": "96c05c4a-47c2-4b03-8490-953887716b09",
+      "info": {
+        "id": "google/gemini-3.6-flash",
+        "displayName": "Google/Gemini 3.6 Flash"
+      },
+      "configuredModelId": "7a96c74c-26ee-4d22-80b0-d78b15ac1e94",
+      "configuredAt": 1787821516849
+    },
+    {
+      "providerId": "96c05c4a-47c2-4b03-8490-953887716b09",
+      "info": {
+        "id": "google/gemini-3.7-flash",
+        "displayName": "Google/Gemini 3.7 Flash"
+      },
+      "configuredModelId": "a1b80b6d-7c82-4cb6-86a5-9ef511542bb2",
+      "configuredAt": 1787821516850
+    },
+    {
+      "providerId": "96c05c4a-47c2-4b03-8490-953887716b09",
+      "info": {
+        "id": "google/gemini-embedding-001",
+        "displayName": "Google/Gemini Embedding 001"
+      },
+      "configuredModelId": "84e76f60-f15f-4744-ba4a-932fda2fa5b8",
+      "configuredAt": 1787821516850
+    },
+    {
+      "providerId": "96c05c4a-47c2-4b03-8490-953887716b09",
+      "info": {
+        "id": "google/gemini-embedding-2",
+        "displayName": "Google/Gemini Embedding 2"
+      },
+      "configuredModelId": "518bd64a-ff20-43bb-a592-95ec6a0f7aa8",
+      "configuredAt": 1787821516851
+    },
+    {
+      "providerId": "96c05c4a-47c2-4b03-8490-953887716b09",
+      "info": {
+        "id": "google/gemini-flash-latest",
+        "displayName": "Google/Gemini Flash Latest"
+      },
+      "configuredModelId": "6de7642f-e468-4bd0-993c-9b84442be9f1",
+      "configuredAt": 1787821516853
+    },
+    {
+      "providerId": "96c05c4a-47c2-4b03-8490-953887716b09",
+      "info": {
+        "id": "google/gemini-flash-lite-latest",
+        "displayName": "Google/Gemini Flash-Lite Latest"
+      },
+      "configuredModelId": "a5c003a2-ed0f-4ac2-8795-63d8a7709d61",
+      "configuredAt": 1787821516854
+    },
+    {
+      "providerId": "96c05c4a-47c2-4b03-8490-953887716b09",
+      "info": {
+        "id": "google/gemini-omni-flash-preview",
+        "displayName": "Google/Gemini Omni Flash Preview"
+      },
+      "configuredModelId": "5890fc89-251b-49cc-8d52-3b0173d34bf8",
+      "configuredAt": 1787821516854
+    },
+    {
+      "providerId": "96c05c4a-47c2-4b03-8490-953887716b09",
+      "info": {
+        "id": "google/gemini-robotics-er-1.6-preview",
+        "displayName": "Google/Gemini Robotics-ER 1.6 Preview"
+      },
+      "configuredModelId": "7161a4ba-ac1c-4090-a09b-f518764d17c1",
+      "configuredAt": 1787821516855
+    },
+    {
+      "providerId": "96c05c4a-47c2-4b03-8490-953887716b09",
+      "info": {
+        "id": "google/gemma-4-26b-a4b-it",
+        "displayName": "Google/Gemma 4 26B A4B IT"
+      },
+      "configuredModelId": "97be54bd-6716-497f-b562-35126e9eb5a9",
+      "configuredAt": 1787821516856
+    },
+    {
+      "providerId": "96c05c4a-47c2-4b03-8490-953887716b09",
+      "info": {
+        "id": "google/gemma-4-31b-it",
+        "displayName": "Google/Gemma 4 31B IT"
+      },
+      "configuredModelId": "e86352ab-d5ac-4f46-91c4-884e554f1d62",
+      "configuredAt": 1787821516856
+    },
+    {
+      "providerId": "96c05c4a-47c2-4b03-8490-953887716b09",
+      "info": {
+        "id": "google/lyria-3-clip-preview",
+        "displayName": "Google/Lyria 3 Clip Preview"
+      },
+      "configuredModelId": "37a25068-c3bf-40a3-9fb9-e4c22fb6546b",
+      "configuredAt": 1787821516857
+    },
+    {
+      "providerId": "96c05c4a-47c2-4b03-8490-953887716b09",
+      "info": {
+        "id": "google/lyria-3-pro-preview",
+        "displayName": "Google/Lyria 3 Pro Preview"
+      },
+      "configuredModelId": "b2ea2ed8-7598-41c4-b663-d148cdf536fd",
+      "configuredAt": 1787821516857
+    },
+    {
+      "providerId": "96c05c4a-47c2-4b03-8490-953887716b09",
+      "info": {
+        "id": "google/gemini-2.5-flash-image",
+        "displayName": "Google/Nano Banana"
+      },
+      "configuredModelId": "3b6bff0d-4c76-4582-9c7d-277430fa0c78",
+      "configuredAt": 1787821516858
+    },
+    {
+      "providerId": "96c05c4a-47c2-4b03-8490-953887716b09",
+      "info": {
+        "id": "google/gemini-3.1-flash-image",
+        "displayName": "Google/Nano Banana 2"
+      },
+      "configuredModelId": "afc16f6a-ff62-4b4f-839f-372448b5f046",
+      "configuredAt": 1787821516859
+    },
+    {
+      "providerId": "96c05c4a-47c2-4b03-8490-953887716b09",
+      "info": {
+        "id": "google/gemini-3.1-flash-image-preview",
+        "displayName": "Google/Nano Banana 2"
+      },
+      "configuredModelId": "0b915561-6f8d-407d-8678-e1ac32573d38",
+      "configuredAt": 1787821516859
+    },
+    {
+      "providerId": "96c05c4a-47c2-4b03-8490-953887716b09",
+      "info": {
+        "id": "google/gemini-3.1-flash-lite-image",
+        "displayName": "Google/Nano Banana 2 Lite"
+      },
+      "configuredModelId": "293ecac8-336c-4b12-9ffb-c8cc68ad9981",
+      "configuredAt": 1787821516860
+    },
+    {
+      "providerId": "96c05c4a-47c2-4b03-8490-953887716b09",
+      "info": {
+        "id": "google/gemini-3-pro-image",
+        "displayName": "Google/Nano Banana Pro"
+      },
+      "configuredModelId": "8f9f765f-f382-47fa-8d36-94a7a5f471ef",
+      "configuredAt": 1787821516860
+    },
+    {
+      "providerId": "96c05c4a-47c2-4b03-8490-953887716b09",
+      "info": {
+        "id": "google/gemini-3-pro-image-preview",
+        "displayName": "Google/Nano Banana Pro"
+      },
+      "configuredModelId": "317c9398-ab91-4fa7-9929-f99d1def770a",
+      "configuredAt": 1787821516861
+    },
+    {
+      "providerId": "96c05c4a-47c2-4b03-8490-953887716b09",
+      "info": {
+        "id": "google/veo-3.1-generate-preview",
+        "displayName": "Google/Veo 3.1"
+      },
+      "configuredModelId": "bcd3ec98-4662-4565-9a16-c57cc236d7f3",
+      "configuredAt": 1787821516861
+    },
+    {
+      "providerId": "96c05c4a-47c2-4b03-8490-953887716b09",
+      "info": {
+        "id": "google/veo-3.1-fast-generate-preview",
+        "displayName": "Google/Veo 3.1 fast"
+      },
+      "configuredModelId": "99ebf8f5-4182-4007-b23c-269b7508588f",
+      "configuredAt": 1787821516861
+    },
+    {
+      "providerId": "96c05c4a-47c2-4b03-8490-953887716b09",
+      "info": {
+        "id": "google/veo-3.1-lite-generate-preview",
+        "displayName": "Google/Veo 3.1 lite"
+      },
+      "configuredModelId": "290d204d-3fe1-41cf-8316-2b8dcce441d7",
+      "configuredAt": 1787821516862
+    },
+    {
+      "providerId": "96c05c4a-47c2-4b03-8490-953887716b09",
+      "info": {
+        "id": "opencode/big-pickle",
+        "displayName": "OpenCode Zen/Big Pickle"
+      },
+      "configuredModelId": "a1cac213-38f3-4255-8572-9dd04dbd1f4e",
+      "configuredAt": 1787821516862
+    },
+    {
+      "providerId": "96c05c4a-47c2-4b03-8490-953887716b09",
+      "info": {
+        "id": "opencode/hy3-free",
+        "displayName": "OpenCode Zen/Hy3 Free"
+      },
+      "configuredModelId": "b7458852-e1fd-460b-8401-7d7d586c561d",
+      "configuredAt": 1787821516862
+    },
+    {
+      "providerId": "96c05c4a-47c2-4b03-8490-953887716b09",
+      "info": {
+        "id": "opencode/mimo-v2.5-free",
+        "displayName": "OpenCode Zen/MiMo V2.5 Free"
+      },
+      "configuredModelId": "2fd59656-03dd-4fc0-814c-cda064dd2d53",
+      "configuredAt": 1787821516864
+    },
+    {
+      "providerId": "96c05c4a-47c2-4b03-8490-953887716b09",
+      "info": {
+        "id": "opencode/muse-spark-1.2-contributor-free",
+        "displayName": "OpenCode Zen/Muse Spark 1.2 Free"
+      },
+      "configuredModelId": "a8784f97-19db-4d5e-ad8a-3bbfe48c061c",
+      "configuredAt": 1787821516864
+    },
+    {
+      "providerId": "96c05c4a-47c2-4b03-8490-953887716b09",
+      "info": {
+        "id": "opencode/nemotron-3-ultra-free",
+        "displayName": "OpenCode Zen/Nemotron 3 Ultra Free"
+      },
+      "configuredModelId": "2fb3195f-4a7e-4be2-ba86-a300f061d1ff",
+      "configuredAt": 1787821516864
+    },
+    {
+      "providerId": "96c05c4a-47c2-4b03-8490-953887716b09",
+      "info": {
+        "id": "opencode/nemotron-3.5-lightning-free",
+        "displayName": "OpenCode Zen/Nemotron 3.5 Lightning Free"
+      },
+      "configuredModelId": "d417370c-dc65-4938-b7a0-2246eeb0e41e",
+      "configuredAt": 1787821516865
+    }
+  ],
+  "backends": {
+    "opencode": {
+      "enabledModels": [
+        "179ce0ae-aab1-4751-ac3a-bfa74a47fa28",
+        "58f4dc7c-0581-47c0-bf38-d7f39066ff01",
+        "842d1f87-db8e-47f7-895b-56c07fc6bf4c"
+      ]
+    }
+  },
+  "_keychainVaultId": "96b43b3d",
+  "settingsVersion": 12
+}

@@ -1,0 +1,16 @@
+[package]
+name = "flappyflight"
+version = "0.2.0"
+description = "An event-driven Flappy Bird clone packed as an offline desktop app."
+authors = ["Antigravity"]
+edition = "2021"
+
+[build-dependencies]
+tauri-build = { version = "2", features = [] }
+
+[dependencies]
+tauri = { version = "2", features = [] }
+
+[lib]
+name = "flappyflight_lib"
+crate-type = ["staticlib", "cdylib", "rlib"]

@@ -11,3 +11,19 @@ Thumbs.db
 .vscode/
 .idea/
 Document/
+
+# SQLite database
+*.db
+*.db-wal
+*.db-shm
+
+# Rust / Tauri build artifacts
+src-tauri/target/
+src-tauri/gen/schemas/
+
+
+
+
+
+# Ignore Smart Environment folder
+.smart-env
