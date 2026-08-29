@@ -1,0 +1,1068 @@
+diff --git a/SRC/game.js b/SRC/game.js
+index 60022ee..5860906 100644
+--- a/SRC/game.js
++++ b/SRC/game.js
+@@ -90,50 +90,71 @@ class SaveManager {
+         }
+     }
+ 
+-    static hasSave() {
+-        return localStorage.getItem(SaveManager.KEY) !== null;
+-    }
+-
+     static deleteSave() {
+         localStorage.removeItem(SaveManager.KEY);
+     }
++
++    static hasSave() {
++        return !!localStorage.getItem(SaveManager.KEY);
++    }
+ }
+ 
+ // ===================== HISTORY MANAGER =====================
+ class HistoryManager {
+-    static KEY = 'faby_gameplays';
++    static KEY = 'faby_history';
++    static MAX = 30;
+ 
+     static getAll() {
+         try {
+-            const raw = localStorage.getItem(HistoryManager.KEY);
+-            return raw ? JSON.parse(raw) : [];
++            return JSON.parse(localStorage.getItem(HistoryManager.KEY) || '[]');
+         } catch (e) {
+             return [];
+         }
+     }
+ 
+     static addRecord(record) {
+-        const records = HistoryManager.getAll();
+-        records.unshift(record);
+-        if (records.length > 50) records.length = 50;
+         try {
+-            localStorage.setItem(HistoryManager.KEY, JSON.stringify(records));
++            const all = HistoryManager.getAll();
++            all.unshift(record);
++            if (all.length > HistoryManager.MAX) all.length = HistoryManager.MAX;
++            localStorage.setItem(HistoryManager.KEY, JSON.stringify(all));
+         } catch (e) {
+             console.warn('History save failed:', e);
+         }
+     }
++}
+ 
+-    static deleteRecord(id) {
+-        const records = HistoryManager.getAll().filter(r => r.id !== id);
+-        localStorage.setItem(HistoryManager.KEY, JSON.stringify(records));
+-    }
++// ===================== TAURI BRIDGE =====================
++function isTauri() {
++    return typeof window !== 'undefined' &&
++        !!(window.__TAURI__ && window.__TAURI__.core);
++}
++
++function tauriInvoke(cmd, args = {}) {
++    if (!isTauri()) return Promise.reject(new Error('Not running inside Tauri'));
++    return window.__TAURI__.core.invoke(cmd, args);
+ }
+ 
+ // ===================== SCORE API =====================
+ class ScoreAPI {
+     static BASE = '/api/scores';
+ 
+-    static async postScore(score, difficulty) {
++    /**
++     * In the packaged Tauri desktop app we talk directly to the local SQLite
++     * database via native commands (single source of truth with db.py).
++     * In the browser we fall back to the Python HTTP API.
++     */
++    static async postScore(score, difficulty = 'medium') {
++        if (isTauri()) {
++            try {
++                const isHigh = await tauriInvoke('db_add_score', { score, difficulty });
++                const high = await tauriInvoke('db_get_high_score', { difficulty });
++                return { ok: true, is_high: !!isHigh, high_score: high };
++            } catch (e) {
++                console.warn('Tauri post failed:', e);
++                return { ok: false };
++            }
++        }
+         try {
+             const res = await fetch(ScoreAPI.BASE, {
+                 method: 'POST',
+@@ -142,45 +163,104 @@ class ScoreAPI {
+             });
+             return await res.json();
+         } catch (e) {
+-            console.warn('API post failed, using local fallback:', e);
++            console.warn('API post failed:', e);
+             return { ok: false };
+         }
+     }
+ 
+-    static async getScores(difficulty) {
++    static async getScores(difficulty = null) {
++        if (isTauri()) {
++            try {
++                const data = await tauriInvoke('db_get_scores', { difficulty });
++                return data.scores || [];
++            } catch (e) {
++                console.warn('Tauri get scores failed:', e);
++                return [];
++            }
++        }
+         try {
+             const url = difficulty ? `${ScoreAPI.BASE}?difficulty=${difficulty}` : ScoreAPI.BASE;
+             const res = await fetch(url);
+             const data = await res.json();
+             return data.scores || [];
+         } catch (e) {
+-            console.warn('API get failed, using local fallback:', e);
++            console.warn('API get failed:', e);
+             return HistoryManager.getAll();
+         }
+     }
+ 
+-    static async getHighScore(difficulty) {
++    static async deleteScore(id) {
++        if (isTauri()) {
++            try {
++                await tauriInvoke('db_delete_score', { id });
++                return true;
++            } catch (e) {
++                console.warn('Tauri delete failed:', e);
++                return false;
++            }
++        }
+         try {
+-            const url = difficulty ? `${ScoreAPI.BASE}?difficulty=${difficulty}` : ScoreAPI.BASE;
++            await fetch(`${ScoreAPI.BASE}/${id}`, { method: 'DELETE' });
++            return true;
++        } catch (e) {
++            console.warn('API delete failed:', e);
++            return false;
++        }
++    }
++
++    static async getHighScore(difficulty = 'medium') {
++        if (isTauri()) {
++            try {
++                return await tauriInvoke('db_get_high_score', { difficulty });
++            } catch (e) {
++                return parseInt(localStorage.getItem(`faby_high_score_${difficulty}`) || '0', 10);
++            }
++        }
++        try {
++            const url = `${ScoreAPI.BASE}?difficulty=${difficulty}`;
+             const res = await fetch(url);
+             const data = await res.json();
+             return data.high_score || 0;
+         } catch (e) {
+-            return parseInt(localStorage.getItem(`faby_high_score_${difficulty}`) || '0', 10);
++            console.warn('API high score fetch failed:', e);
++            return false;
+         }
+     }
+ 
+-    static async deleteScore(id) {
++    static async getStats(difficulty = 'medium') {
++        if (isTauri()) {
++            try {
++                const stats = await tauriInvoke('db_get_stats', { difficulty });
++                return {
++                    total_games: stats.total_games || 0,
++                    high_score: stats.high_score || 0,
++                    avg_score: stats.avg_score || 0
++                };
++            } catch (e) {
++                console.warn('Tauri stats failed:', e);
++                return { total_games: 0, high_score: 0, avg_score: 0 };
++            }
++        }
+         try {
+-            await fetch(`${ScoreAPI.BASE}/${id}`, { method: 'DELETE' });
+-            return true;
++            const res = await fetch(`/api/scores/stats?difficulty=${difficulty}`);
++            if (!res.ok) throw new Error('API server error');
++            return await res.json();
+         } catch (e) {
+-            console.warn('API delete failed:', e);
+-            return false;
++            console.warn('API stats failed:', e);
++            return { total_games: 0, high_score: 0, avg_score: 0 };
+         }
+     }
+ 
+     static async archiveScore(id) {
++        if (isTauri()) {
++            try {
++                await tauriInvoke('db_archive_score', { id });
++                return { ok: true };
++            } catch (e) {
++                console.warn('Tauri archive failed:', e);
++                return { ok: false };
++            }
++        }
+         try {
+             const res = await fetch(`${ScoreAPI.BASE}/${id}/archive`, { method: 'POST' });
+             return await res.json();
+@@ -191,6 +271,15 @@ class ScoreAPI {
+     }
+ 
+     static async getArchives() {
++        if (isTauri()) {
++            try {
++                const data = await tauriInvoke('db_get_archives', {});
++                return data.archives || [];
++            } catch (e) {
++                console.warn('Tauri archives get failed:', e);
++                return [];
++            }
++        }
+         try {
+             const res = await fetch('/api/archives');
+             const data = await res.json();
+@@ -200,6 +289,43 @@ class ScoreAPI {
+             return [];
+         }
+     }
++
++    static async getArchiveCount() {
++        if (isTauri()) {
++            try {
++                return await tauriInvoke('db_get_archive_count', {});
++            } catch (e) {
++                return 0;
++            }
++        }
++        try {
++            const res = await fetch('/api/archives/count');
++            const data = await res.json();
++            return data.count || 0;
++        } catch (e) {
++            console.warn('API archive count failed:', e);
++            return 0;
++        }
++    }
++
++    static async deleteArchive(id) {
++        if (isTauri()) {
++            try {
++                await tauriInvoke('db_delete_archive', { id });
++                return true;
++            } catch (e) {
++                console.warn('Tauri archive delete failed:', e);
++                return false;
++            }
++        }
++        try {
++            await fetch(`/api/archives/${id}`, { method: 'DELETE' });
++            return true;
++        } catch (e) {
++            console.warn('API archive delete failed:', e);
++            return false;
++        }
++    }
+ }
+ 
+ // ===================== CONSTANTS =====================
+@@ -212,9 +338,18 @@ const PHYSICS = {
+     GRAVITY: 0.36,
+     FLAP_IMPULSE: -6.2,
+     TERMINAL_VELOCITY: 9,
+-    BIRD_X: 100
++    BIRD_X: 100,
++    // Bird visual + limb physics
++    BIRD_HEIGHT: 36,       // target on-screen height of the bird sprite
++    BASE_RADIUS: 20,       // collision radius
++    WING_AMPLITUDE: 0.55,  // max wing flap angle (radians)
++    WING_BASE_SPEED: 0.22  // wing flap speed at idle
+ };
+ 
++function clamp(v, lo, hi) {
++    return v < lo ? lo : (v > hi ? hi : v);
++}
++
+ const DIFFICULTY_CONFIG = {
+     easy:   { gapSize: 140, speed: 2.2, spawnInterval: 110, name: 'Easy' },
+     medium: { gapSize: 128, speed: 2.6, spawnInterval: 98,  name: 'Medium' },
+@@ -245,9 +380,55 @@ const SKINS = {
+         tail: '#fbbf24',
+         cheek: 'rgba(56, 189, 248, 0.35)',
+         glow: 'rgba(16, 185, 129, 0.4)'
++    },
++    bird_1: {
++        imageSrc: 'assets/bird_1.png',
++        accent: '#ca8a04',
++        dark: '#854d0e',
++        glow: 'rgba(245, 158, 11, 0.4)'
++    },
++    bird_2: {
++        imageSrc: 'assets/bird_2.png',
++        accent: '#1d4ed8',
++        dark: '#1e3a8a',
++        glow: 'rgba(59, 130, 246, 0.4)'
++    },
++    bird_3: {
++        imageSrc: 'assets/bird_3.png',
++        accent: '#7c3aed',
++        dark: '#5b21b6',
++        glow: 'rgba(239, 68, 68, 0.4)'
++    },
++    bird_4: {
++        imageSrc: 'assets/bird_4.png',
++        accent: '#dc2626',
++        dark: '#7f1d1d',
++        glow: 'rgba(16, 185, 129, 0.4)'
++    },
++    bird_5: {
++        imageSrc: 'assets/bird_5.png',
++        accent: '#ea580c',
++        dark: '#9a3412',
++        glow: 'rgba(244, 63, 94, 0.4)'
++    },
++    bird_6: {
++        imageSrc: 'assets/bird_6.png',
++        accent: '#a16207',
++        dark: '#713f12',
++        glow: 'rgba(139, 92, 246, 0.4)'
+     }
+ };
+ 
++// Custom bird image preloading
++const birdImages = {};
++Object.keys(SKINS).forEach(key => {
++    if (SKINS[key].imageSrc) {
++        const img = new Image();
++        img.src = SKINS[key].imageSrc;
++        birdImages[key] = img;
++    }
++});
++
+ const GAME_STATES = {
+     MENU: 'MENU',
+     PLAYING: 'PLAYING',
+@@ -287,6 +468,12 @@ class Game {
+         this.highScoreDisplay = document.getElementById('high-score');
+         this.gameOverDiffDisplay = document.getElementById('game-over-diff');
+ 
++        // DOM - data screen views/tabs
++        this.tabLogsBtn = document.getElementById('tab-logs');
++        this.tabArchivesBtn = document.getElementById('tab-archives');
++        this.logsView = document.getElementById('logs-view');
++        this.archivesView = document.getElementById('archives-view');
++
+         // Scale
+         this.scale = 1;
+         this.logicalWidth = 400;
+@@ -308,7 +495,7 @@ class Game {
+         this.highScore = 0;
+ 
+         // Entities
+-        this.bird = { y: 250, velocity: 0, radius: 14, wingAngle: 0, wingDirection: 1 };
++        this.bird = this.makeBird();
+         this.pipes = [];
+         this.clouds = [];
+         this.groundOffset = 0;
+@@ -395,6 +582,20 @@ class Game {
+         // Data screen back
+         this.dataBackBtn.addEventListener('click', (e) => { e.stopPropagation(); this.enterMenu(); });
+ 
++        // Data screen tab switch
++        if (this.tabLogsBtn) {
++            this.tabLogsBtn.addEventListener('click', (e) => {
++                e.stopPropagation();
++                this.switchDataView('logs');
++            });
++        }
++        if (this.tabArchivesBtn) {
++            this.tabArchivesBtn.addEventListener('click', (e) => {
++                e.stopPropagation();
++                this.switchDataView('archives');
++            });
++        }
++
+         // Difficulty selectors (Segmented)
+         document.querySelectorAll('.diff-select-btn').forEach(btn => {
+             btn.addEventListener('click', (e) => {
+@@ -461,12 +662,20 @@ class Game {
+         pctx.clearRect(0, 0, previewCanvas.width, previewCanvas.height);
+ 
+         // Wing flapping angle based on time
+-        const time = performance.now() * 0.012;
+-        const previewWingAngle = Math.sin(time) * 0.45;
+-
++        const time = performance.now() / 1000;
++        const phase = time * 7;
++        const previewBird = {
++            velocity: 0,
++            wingAngle: Math.sin(phase) * PHYSICS.WING_AMPLITUDE,
++            wingPhase: phase,
++            tailAngle: Math.sin(phase * 2) * 0.05,
++            legPhase: time * 2,
++            onGround: false,
++            flapEnergy: 0.3
++        };
+         pctx.save();
+         pctx.translate(previewCanvas.width / 2, previewCanvas.height / 2 + 3);
+-        this.drawBird(pctx, 0, 0, previewWingAngle, this.skin, 0);
++        this.drawBird(pctx, 0, 0, previewBird, this.skin);
+         pctx.restore();
+     }
+ 
+@@ -492,14 +701,10 @@ class Game {
+ 
+     async loadMenuStats() {
+         try {
+-            const res = await fetch(`/api/scores/stats?difficulty=${this.difficulty}`);
+-            if (!res.ok) throw new Error('API server error');
+-            const stats = await res.json();
+-            
++            const stats = await ScoreAPI.getStats(this.difficulty);
+             const highEl = document.getElementById('stat-high');
+             const totalEl = document.getElementById('stat-total');
+             const avgEl = document.getElementById('stat-avg');
+-            
+             if (highEl) highEl.textContent = stats.high_score || 0;
+             if (totalEl) totalEl.textContent = stats.total_games || 0;
+             if (avgEl) avgEl.textContent = Math.round(stats.avg_score) || 0;
+@@ -554,10 +759,20 @@ class Game {
+         if (this.hud) this.hud.classList.add('hud-hidden');
+ 
+         this.populateDataList();
++        this.populateArchivesList();
++        this.switchDataView('logs');
+         this.resetEntitiesForAttract();
+         this.startAttractLoop();
+     }
+ 
++    switchDataView(view) {
++        const showLogs = view === 'logs';
++        if (this.logsView) this.logsView.classList.toggle('hidden', !showLogs);
++        if (this.archivesView) this.archivesView.classList.toggle('hidden', showLogs);
++        if (this.tabLogsBtn) this.tabLogsBtn.classList.toggle('active', showLogs);
++        if (this.tabArchivesBtn) this.tabArchivesBtn.classList.toggle('active', !showLogs);
++    }
++
+     enterGamePlaying() {
+         this.state = GAME_STATES.PLAYING;
+         if (this.mainMenu) this.mainMenu.classList.add('hidden');
+@@ -601,6 +816,8 @@ class Game {
+ 
+     flap() {
+         this.bird.velocity = PHYSICS.FLAP_IMPULSE;
++        this.bird.flapEnergy = 1;
++        this.bird.wingPhase += Math.PI;       // snap wings to a full flap stroke
+         this.sound.playFlap();
+     }
+ 
+@@ -620,7 +837,7 @@ class Game {
+ 
+         this.difficulty = saved.difficulty;
+         this.score = saved.score;
+-        this.bird = { ...saved.bird };
++        this.bird = this.normalizeBird(saved.bird);
+         this.pipes = saved.pipes.map(p => ({ ...p }));
+         this.clouds = saved.clouds.map(c => ({ ...c }));
+         this.groundOffset = saved.groundOffset;
+@@ -660,7 +877,7 @@ class Game {
+ 
+             this.difficulty = saved.difficulty;
+             this.score = saved.score;
+-            this.bird = { ...saved.bird };
++            this.bird = this.normalizeBird(saved.bird);
+             this.pipes = saved.pipes.map(p => ({ ...p }));
+             this.clouds = saved.clouds.map(c => ({ ...c }));
+             this.groundOffset = saved.groundOffset;
+@@ -734,11 +951,10 @@ class Game {
+     // ---- Data Screen ----
+ 
+     loadArchiveCount() {
+-        fetch('/api/archives/count')
+-            .then(res => res.json())
+-            .then(data => {
++        ScoreAPI.getArchiveCount()
++            .then(count => {
+                 const el = document.getElementById('data-arch-count');
+-                if (el) el.textContent = `\u{1F4C2} ${data.count || 0} saved`;
++                if (el) el.textContent = `\u{1F4C2} ${count || 0} saved`;
+             })
+             .catch(() => {});
+     }
+@@ -821,11 +1037,79 @@ class Game {
+         });
+     }
+ 
++    populateArchivesList() {
++        ScoreAPI.getArchives().then(records => {
++            const tbody = document.getElementById('archives-tbody');
++            const emptyMsg = document.getElementById('archives-empty');
++
++            if (!tbody) return;
++
++            if (records.length === 0) {
++                tbody.innerHTML = '';
++                if (emptyMsg) emptyMsg.classList.add('visible');
++                return;
++            }
++
++            if (emptyMsg) emptyMsg.classList.remove('visible');
++
++            tbody.innerHTML = records.map((r, i) => {
++                const diffClass = `diff-badge-${r.difficulty}`;
++                const diffName = DIFFICULTY_CONFIG[r.difficulty]?.name || r.difficulty;
++                const date = new Date(r.archived_at || r.created_at);
++                const dateStr = date.toLocaleDateString(undefined, { month: 'short', day: 'numeric' });
++                const timeStr = date.toLocaleTimeString(undefined, { hour: '2-digit', minute: '2-digit' });
++                const highBadge = r.is_high ? '<span class="high-badge">HIGH</span>' : '';
++                return `
++                    <tr class="data-row" data-id="${r.id}">
++                        <td class="td-num">${i + 1}</td>
++                        <td class="td-diff"><span class="diff-badge ${diffClass}">${diffName}</span></td>
++                        <td class="td-score">${r.score} ${highBadge}</td>
++                        <td class="td-date">${dateStr} ${timeStr}</td>
++                        <td class="td-actions">
++                            <button class="record-btn record-btn-unarchive" data-action="unarchive" data-id="${r.id}">Unarchive</button>
++                            <button class="record-btn record-btn-delete" data-action="delete" data-id="${r.id}">Del</button>
++                        </td>
++                    </tr>
++                `;
++            }).join('');
++
++            // Bind Unarchive
++            tbody.querySelectorAll('.record-btn-unarchive').forEach(btn => {
++                btn.addEventListener('click', (e) => {
++                    e.stopPropagation();
++                    const id = parseInt(btn.getAttribute('data-id'), 10);
++                    if (confirm("Return this saved flight to the flight logs? (source log is kept)")) {
++                        ScoreAPI.deleteArchive(id).then(() => {
++                            this.populateArchivesList();
++                            this.populateDataList();
++                            this.loadArchiveCount();
++                        });
++                    }
++                });
++            });
++
++            // Bind Delete (archive)
++            tbody.querySelectorAll('.record-btn-delete').forEach(btn => {
++                btn.addEventListener('click', (e) => {
++                    e.stopPropagation();
++                    const id = parseInt(btn.getAttribute('data-id'), 10);
++                    if (confirm("Are you sure you want to permanently delete this saved flight?")) {
++                        ScoreAPI.deleteArchive(id).then(() => {
++                            this.populateArchivesList();
++                            this.populateDataList();
++                            this.loadArchiveCount();
++                        });
++                    }
++                });
++            });
++        });
++    }
++
+     // ---- Reset Helpers ----
+ 
+     resetGameState() {
+         this.score = 0;
+-        this.bird = { y: 250, velocity: 0, radius: 14, wingAngle: 0, wingDirection: 1 };
++        this.bird = this.makeBird();
+         this.pipes = [];
+         this.pipeSpawnAccum = 0;
+         this.groundOffset = 0;
+@@ -834,7 +1118,7 @@ class Game {
+ 
+     resetEntitiesForAttract() {
+         this.score = 0;
+-        this.bird = { y: 250, velocity: 0, radius: 14, wingAngle: 0, wingDirection: 1 };
++        this.bird = this.makeBird();
+         this.pipes = [];
+         this.pipeSpawnAccum = 0;
+         this.groundOffset = 0;
+@@ -843,6 +1127,240 @@ class Game {
+         this.initClouds();
+     }
+ 
++    makeBird() {
++        return {
++            y: 250,
++            velocity: 0,
++            radius: PHYSICS.BASE_RADIUS,
++            wingAngle: 0,
++            wingDirection: 1,
++            wingPhase: Math.random() * Math.PI * 2,
++            tailAngle: 0,
++            legPhase: Math.random() * Math.PI * 2,
++            onGround: false,
++            flapEnergy: 0
++        };
++    }
++
++    // Merge an old/partial saved bird (from a previous save) with full defaults so
++    // physics fields always exist even when loading older saves.
++    normalizeBird(partial) {
++        return { ...this.makeBird(), ...(partial || {}) };
++    }
++
++    // ---- Bird Physique (wings, tail, legs) ----
++
++    // Drives the physics-based animation of the bird's wing, tail and legs.
++    // Response is tied to vertical velocity, flap energy and ground contact.
++    updateBirdPhysics(bird, timeScale) {
++        // Decay the impulse-boost from the most recent flap
++        bird.flapEnergy = Math.max(0, bird.flapEnergy - 0.06 * timeScale);
++
++        // Wing: continuous flap cycle whose frequency and amplitude react to speed
++        // and to how recently the bird flapped (faster, tighter wings on a flap).
++        const divert = clamp(Math.max(bird.velocity, 0) / PHYSICS.TERMINAL_VELOCITY, 0, 1);
++        const wingSpeed = PHYSICS.WING_BASE_SPEED * (1 + (1 - divert) * 1.2 + bird.flapEnergy * 2.5);
++        bird.wingPhase += wingSpeed * timeScale;
++        bird.wingAngle = Math.sin(bird.wingPhase) * PHYSICS.WING_AMPLITUDE * (0.75 + bird.flapEnergy * 0.5);
++
++        // Tail: pitches up while climbing, droops while diving, plus a light flick
++        const climb = clamp(-bird.velocity / 6, 0, 1);
++        const dive = clamp(bird.velocity / 6, 0, 1);
++        const tailTarget = climb * 0.45 - dive * 0.7 + Math.sin(bird.wingPhase * 2) * 0.05;
++        bird.tailAngle += (tailTarget - bird.tailAngle) * 0.18 * timeScale;
++
++        // Legs: advance a walk/tuck cycle; phase advances faster when flapping
++        bird.legPhase += bird.flapEnergy > 0.2 ? 0.35 * timeScale : 0.14 * timeScale;
++    }
++
++    // Draws the bird's animated wing (a flapping near-side wing over the body) — used by procedural skins.
++    drawLimbWing(ctx, w, h, bird, skin) {
++        const wingAngle = bird.wingAngle;
++        const flapTightness = 1 - bird.flapEnergy * 0.4;   // fold wing in slightly on a hard flap
++        ctx.save();
++        ctx.translate(w * 0.02, -h * 0.12);
++        ctx.rotate(wingAngle);
++        const grad = ctx.createLinearGradient(-14, 0, 4, 0);
++        grad.addColorStop(0, skin.accent || '#d97706');
++        grad.addColorStop(1, skin.dark || '#78350f');
++        ctx.fillStyle = grad;
++        ctx.strokeStyle = skin.dark || '#78350f';
++        ctx.lineWidth = 2;
++        ctx.beginPath();
++        ctx.moveTo(2, -2);
++        ctx.bezierCurveTo(-6, -8, -16, -8, -20 * flapTightness, 0);
++        ctx.bezierCurveTo(-16, 6, -6, 6, 2, 2);
++        ctx.closePath();
++        ctx.fill();
++        ctx.stroke();
++        ctx.restore();
++    }
++
++    // Draws the bird's tail feathers — used by procedural skins.
++    drawLimbTail(ctx, w, h, bird, skin) {
++        const base = -w * 0.34;
++        ctx.save();
++        ctx.translate(base, h * 0.02);
++        ctx.rotate(bird.tailAngle);
++        ctx.fillStyle = skin.accent || '#d97706';
++        ctx.strokeStyle = skin.dark || '#78350f';
++        ctx.lineWidth = 2;
++        const len = w * 0.30;
++        // top feather
++        ctx.beginPath();
++        ctx.moveTo(0, 0);
++        ctx.lineTo(-len, -h * 0.12);
++        ctx.lineTo(-len * 0.8, 0);
++        ctx.closePath();
++        ctx.fill();
++        ctx.stroke();
++        // bottom feather
++        ctx.beginPath();
++        ctx.moveTo(0, 0);
++        ctx.lineTo(-len, h * 0.10);
++        ctx.lineTo(-len * 0.8, 0);
++        ctx.closePath();
++        ctx.fill();
++        ctx.stroke();
++        ctx.restore();
++    }
++
++    // Draws the bird's legs (tucked while airborne, trailing below, walking on ground) — used by procedural skins.
++    drawLimbLegs(ctx, w, h, bird, skin) {
++        const tuck = 1 - Math.min(1, bird.flapEnergy) * 0.55;      // legs pull up on flap
++        const legLen = h * 0.42 * tuck;
++        const anchorY = h * 0.40;
++        // horizontal sway: stream back while diving, swing when walking
++        const airSway = Math.max(bird.velocity * 0.35, 0) + (tuck < 1 ? Math.sin(bird.legPhase) * 2 : 0);
++        const groundSway = bird.onGround ? Math.sin(bird.legPhase) * 3.5 : 0;
++        const sway = bird.onGround ? groundSway : airSway;
++
++        ctx.strokeStyle = skin.dark || '#78350f';
++        ctx.fillStyle = skin.accent || '#d97706';
++        ctx.lineWidth = 2;
++        ctx.lineCap = 'round';
++        for (let i = 0; i < 2; i++) {
++            const bx = (i === 0 ? -3 : 3) + sway * (i === 0 ? 0.6 : 0.4);
++            const fx = (i === 0 ? -4 : 5) + sway * (i === 0 ? 0.2 : -0.2);
++            // thigh
++            ctx.beginPath();
++            ctx.moveTo(bx, anchorY);
++            ctx.quadraticCurveTo(bx, anchorY + legLen * 0.55, fx, anchorY + legLen * 0.55);
++            ctx.stroke();
++            // foot (small triangle)
++            ctx.beginPath();
++            ctx.moveTo(fx, anchorY + legLen * 0.55);
++            ctx.lineTo(fx - 3, anchorY + legLen * 0.55 + 3);
++            ctx.lineTo(fx + 3, anchorY + legLen * 0.55 + 3);
++            ctx.closePath();
++            ctx.fill();
++        }
++    }
++
++    // =====================================================================
++    // SPRITE-BASED PHYSICS ANIMATION (bird_1 … bird_6 image skins)
++    // =====================================================================
++    //
++    // Each sprite is a single flat PNG that already has a body, wing, tail
++    // and legs drawn into it.  Rather than drawing opaque canvas shapes
++    // on top of the artwork (which would obscure it), we animate the sprite
++    // itself by cutting it into three horizontal bands and applying
++    // independent canvas transforms to each band:
++    //
++    //   TOP  band  (~35 % of height) — contains wings / back feathers
++    //              → scaleY oscillates with wing-flap physics so the wings
++    //                appear to fold and extend.
++    //
++    //   MID  band  (~45 % of height) — the body core (head, eye, beak)
++    //              → drawn normally; acts as the anchor.
++    //
++    //   TAIL band  (~20 % of height) — tail and rear legs
++    //              → rotated around its top edge using bird.tailAngle so
++    //                the tail pitches up when climbing and droops when diving.
++    //
++    // Legs on the sprite are inside the TAIL band, so their natural leg-
++    // bob comes from the tail rotation.  A small additional vertical
++    // oscillation (legBob) is added to the tail band origin to simulate
++    // the tucking/extending motion when flapping.
++    // =====================================================================
++
++    drawSpritePhysics(ctx, img, w, h, bird) {
++        const sw = img.naturalWidth;
++        const sh = img.naturalHeight;
++
++        // Flip horizontally so the bird faces right (sprites are drawn facing left).
++        // All band draws use symmetric x offsets (-w/2 … w/2), so one scale is enough.
++        ctx.scale(-1, 1);
++
++        // --- Define band boundaries (in sprite pixel space) ---
++        const topFrac  = 0.38;   // top   0 .. 38% → wings / upper back
++        const tailFrac = 0.72;   // tail  72% .. 100% → tail + legs
++
++        const topPx  = Math.round(sh * topFrac);
++        const tailPx = Math.round(sh * tailFrac);
++
++        // ----------------------------------------------------------------
++        // 1.  TOP BAND  — wing flap via scaleY
++        // ----------------------------------------------------------------
++        //  wingAngle in radians → map to a scaleY factor:
++        //    wings fully up  (angle ≈ +AMPLITUDE) → scaleY ≈ 0.55  (compressed)
++        //    wings level     (angle ≈ 0)            → scaleY ≈ 1.00
++        //    wings fully down(angle ≈ -AMPLITUDE)   → scaleY ≈ 1.45  (stretched)
++        //  We also squeeze the top band slightly horizontally on a hard flap.
++        const rawWing = bird.wingAngle / PHYSICS.WING_AMPLITUDE; // –1..+1
++        const wingScaleY = 1.0 - rawWing * 0.42;                 //  0.58..1.42
++        const wingScaleX = 1.0 + bird.flapEnergy * 0.06;         // very subtle stretch on impulse
++
++        ctx.save();
++        // No clip — allow the wing/head band to paint freely so it is never
++        // cut off during the flap animation. We pivot from the bottom edge
++        // of the top band (the body junction) so the sprite grows upward.
++        ctx.translate(0, -h / 2 + h * topFrac);   // pivot at body junction
++        ctx.scale(wingScaleX, wingScaleY);
++        ctx.drawImage(img,
++            0, 0, sw, topPx,
++            -w / 2, -h * topFrac,
++            w, h * topFrac);
++        ctx.restore();
++
++        // ----------------------------------------------------------------
++        // 2.  MIDDLE BAND  — drawn as-is (body anchor)
++        // ----------------------------------------------------------------
++        ctx.save();
++        ctx.beginPath();
++        ctx.rect(-w / 2, -h / 2 + h * topFrac, w, h * (tailFrac - topFrac));
++        ctx.clip();
++        ctx.drawImage(img,
++            0, topPx, sw, tailPx - topPx,
++            -w / 2, -h / 2 + h * topFrac,
++            w, h * (tailFrac - topFrac));
++        ctx.restore();
++
++        // ----------------------------------------------------------------
++        // 3.  TAIL / LEG BAND  — tail-angle rotation + leg-bob translate
++        // ----------------------------------------------------------------
++        //  tailAngle: positive when climbing (tail up), negative when diving.
++        //  We pivot around the top-left edge of this band.
++
++        // Leg bob: upward tuck when flapEnergy is high; subtle oscillation otherwise.
++        const legBob = -bird.flapEnergy * h * 0.06 +
++                        Math.sin(bird.legPhase) * h * 0.025 * (1 - bird.flapEnergy);
++
++        ctx.save();
++        // Clip to tail band region in destination space
++        ctx.beginPath();
++        ctx.rect(-w / 2, -h / 2 + h * tailFrac, w, h * (1 - tailFrac));
++        ctx.clip();
++        // Pivot at the top-centre of the tail band
++        ctx.translate(0, -h / 2 + h * tailFrac + legBob);
++        ctx.rotate(bird.tailAngle);
++        ctx.drawImage(img,
++            0, tailPx, sw, sh - tailPx,
++            -w / 2, 0,
++            w, h * (1 - tailFrac));
++        ctx.restore();
++    }
++
+     // ---- Attract Mode (Live Background) ----
+ 
+     startAttractLoop() {
+@@ -877,6 +1395,8 @@ class Game {
+         this.attractTimer++;
+         if (this.attractTimer >= this.attractFlapInterval) {
+             this.bird.velocity = PHYSICS.FLAP_IMPULSE * 0.85;
++            this.bird.flapEnergy = 1;
++            this.bird.wingPhase += Math.PI;
+             this.attractTimer = 0;
+             this.attractFlapInterval = 35 + Math.floor(Math.random() * 50);
+         }
+@@ -887,6 +1407,7 @@ class Game {
+             this.bird.velocity = PHYSICS.TERMINAL_VELOCITY;
+         }
+         this.bird.y += this.bird.velocity * timeScale;
++        this.bird.onGround = false;
+ 
+         // Bounce off top/bottom
+         if (this.bird.y - this.bird.radius <= 0) {
+@@ -895,12 +1416,11 @@ class Game {
+         }
+         if (this.bird.y + this.bird.radius >= BASE_HEIGHT - GROUND_HEIGHT) {
+             this.bird.y = BASE_HEIGHT - GROUND_HEIGHT - this.bird.radius;
++            this.bird.onGround = true;
+             this.bird.velocity = PHYSICS.FLAP_IMPULSE * 0.7;
+         }
+ 
+-        // Wing animation
+-        this.bird.wingAngle += 0.18 * this.bird.wingDirection * timeScale;
+-        if (Math.abs(this.bird.wingAngle) > 0.45) this.bird.wingDirection *= -1;
++        this.updateBirdPhysics(this.bird, timeScale);
+ 
+         // Scroll ground
+         this.groundOffset = (this.groundOffset - config.speed * timeScale) % 24;
+@@ -970,10 +1490,9 @@ class Game {
+             this.bird.velocity = PHYSICS.TERMINAL_VELOCITY;
+         }
+         this.bird.y += this.bird.velocity * timeScale;
++        this.bird.onGround = false;
+ 
+-        // Wing animation
+-        this.bird.wingAngle += 0.18 * this.bird.wingDirection * timeScale;
+-        if (Math.abs(this.bird.wingAngle) > 0.45) this.bird.wingDirection *= -1;
++        this.updateBirdPhysics(this.bird, timeScale);
+ 
+         // Ceiling
+         if (this.bird.y - this.bird.radius <= 0) {
+@@ -983,6 +1502,7 @@ class Game {
+         // Ground collision
+         if (this.bird.y + this.bird.radius >= BASE_HEIGHT - GROUND_HEIGHT) {
+             this.bird.y = BASE_HEIGHT - GROUND_HEIGHT - this.bird.radius;
++            this.bird.onGround = true;
+             this.onGameOver();
+             return;
+         }
+@@ -1135,13 +1655,14 @@ class Game {
+         this.ctx.stroke();
+ 
+         // Bird
+-        this.drawBird(this.ctx, PHYSICS.BIRD_X, this.bird.y, this.bird.wingAngle, this.skin, this.bird.velocity);
++        this.drawBird(this.ctx, PHYSICS.BIRD_X, this.bird.y, this.bird, this.skin);
+ 
+         this.ctx.restore();
+     }
+ 
+-    drawBird(ctx, x, y, wingAngle, skinKey, velocity = 0) {
++    drawBird(ctx, x, y, bird, skinKey) {
+         const skin = SKINS[skinKey] || SKINS.gold;
++        const velocity = bird.velocity;
+         ctx.save();
+         ctx.translate(x, y);
+         const rotAngle = Math.min(Math.PI / 3.2, Math.max(-Math.PI / 10, velocity * 0.08));
+@@ -1150,86 +1671,95 @@ class Game {
+         ctx.shadowBlur = 10;
+         ctx.shadowColor = skin.glow;
+ 
+-        // Tail
+-        ctx.fillStyle = skin.tail;
+-        ctx.strokeStyle = '#78350f';
+-        ctx.lineWidth = 2;
+-        ctx.beginPath();
+-        ctx.moveTo(-14, 0);
+-        ctx.lineTo(-22, -6);
+-        ctx.lineTo(-20, 2);
+-        ctx.closePath();
+-        ctx.fill();
+-        ctx.stroke();
+-
+-        // Body
+-        const bodyGrad = ctx.createRadialGradient(-3, -3, 2, 0, 0, 14);
+-        bodyGrad.addColorStop(0, skin.body[0]);
+-        bodyGrad.addColorStop(0.5, skin.body[1]);
+-        bodyGrad.addColorStop(1, skin.body[2]);
+-        ctx.fillStyle = bodyGrad;
+-        ctx.strokeStyle = '#78350f';
+-        ctx.lineWidth = 2.5;
+-        ctx.beginPath();
+-        ctx.arc(0, 0, 14, 0, Math.PI * 2);
+-        ctx.fill();
+-        ctx.stroke();
+-
+-        ctx.shadowBlur = 0;
+-
+-        // Highlight
+-        ctx.fillStyle = 'rgba(255, 255, 255, 0.35)';
+-        ctx.beginPath();
+-        ctx.arc(-4, -6, 4, 0, Math.PI * 2);
+-        ctx.fill();
+-
+-        // Cheek
+-        ctx.fillStyle = skin.cheek;
+-        ctx.beginPath();
+-        ctx.arc(1, 4, 3.5, 0, Math.PI * 2);
+-        ctx.fill();
+-
+-        // Eye
+-        ctx.fillStyle = '#ffffff';
+-        ctx.beginPath();
+-        ctx.arc(5, -4, 5.5, 0, Math.PI * 2);
+-        ctx.fill();
+-        ctx.stroke();
+-        ctx.fillStyle = '#000000';
+-        ctx.beginPath();
+-        ctx.arc(6.5, -4, 2.2, 0, Math.PI * 2);
+-        ctx.fill();
+-        ctx.fillStyle = '#ffffff';
+-        ctx.beginPath();
+-        ctx.arc(5.5, -5, 0.8, 0, Math.PI * 2);
+-        ctx.fill();
+-
+-        // Beak
+-        const beakGrad = ctx.createLinearGradient(10, 0, 20, 0);
+-        beakGrad.addColorStop(0, '#f97316');
+-        beakGrad.addColorStop(1, '#ea580c');
+-        ctx.fillStyle = beakGrad;
+-        ctx.beginPath();
+-        ctx.moveTo(11, -1.5);
+-        ctx.lineTo(21, 1.5);
+-        ctx.lineTo(10.5, 4.5);
+-        ctx.closePath();
+-        ctx.fill();
+-        ctx.stroke();
+-
+-        // Wing
+-        const wingGrad = ctx.createLinearGradient(-13, 0, 3, 0);
+-        wingGrad.addColorStop(0, skin.body[1]);
+-        wingGrad.addColorStop(1, skin.body[2]);
+-        ctx.fillStyle = wingGrad;
+-        ctx.save();
+-        ctx.translate(-4, 2);
+-        ctx.rotate(wingAngle);
+-        ctx.beginPath();
+-        ctx.ellipse(0, 0, 8.5, 5.5, 0, 0, Math.PI * 2);
+-        ctx.fill();
+-        ctx.stroke();
+-        ctx.restore();
++        if (skin.imageSrc) {
++            const img = birdImages[skinKey];
++            if (img && img.complete) {
++                // Scale the high-res sprite up to a proper in-game size while preserving
++                // the native aspect ratio so the bird is actually visible.
++                const imgW = img.naturalWidth || 28;
++                const imgH = img.naturalHeight || 28;
++                const h = PHYSICS.BIRD_HEIGHT;
++                const w = imgW / imgH * h;
++                this.birdSpriteW = w;
++                this.birdSpriteH = h;
++
++                // Animate the sprite using physics-driven band-slicing transforms
++                // (wing flap → top band scaleY, tail pitch → tail band rotation,
++                //  leg tuck/bob → tail band Y offset).
++                this.drawSpritePhysics(ctx, img, w, h, bird);
++            } else {
++                // Fallback to simple circle while image loads
++                ctx.fillStyle = skin.accent || '#f59e0b';
++                ctx.beginPath();
++                ctx.arc(0, 0, PHYSICS.BIRD_HEIGHT / 2, 0, Math.PI * 2);
++                ctx.fill();
++                ctx.strokeStyle = skin.dark || '#78350f';
++                ctx.lineWidth = 2.5;
++                ctx.stroke();
++            }
++        } else {
++            // ---- Procedural skins (gold / neon / ruby / emerald) ----
++            this.drawLimbTail(ctx, 28, 28, bird, skin);
++
++            // Body
++            const bodyGrad = ctx.createRadialGradient(-3, -3, 2, 0, 0, 14);
++            bodyGrad.addColorStop(0, skin.body[0]);
++            bodyGrad.addColorStop(0.5, skin.body[1]);
++            bodyGrad.addColorStop(1, skin.body[2]);
++            ctx.fillStyle = bodyGrad;
++            ctx.strokeStyle = '#78350f';
++            ctx.lineWidth = 2.5;
++            ctx.beginPath();
++            ctx.arc(0, 0, 14, 0, Math.PI * 2);
++            ctx.fill();
++            ctx.stroke();
++
++            ctx.shadowBlur = 0;
++
++            // Highlight
++            ctx.fillStyle = 'rgba(255, 255, 255, 0.35)';
++            ctx.beginPath();
++            ctx.arc(-4, -6, 4, 0, Math.PI * 2);
++            ctx.fill();
++
++            // Cheek
++            ctx.fillStyle = skin.cheek;
++            ctx.beginPath();
++            ctx.arc(1, 4, 3.5, 0, Math.PI * 2);
++            ctx.fill();
++
++            // Eye
++            ctx.fillStyle = '#ffffff';
++            ctx.beginPath();
++            ctx.arc(5, -4, 5.5, 0, Math.PI * 2);
++            ctx.fill();
++            ctx.stroke();
++            ctx.fillStyle = '#000000';
++            ctx.beginPath();
++            ctx.arc(6.5, -4, 2.2, 0, Math.PI * 2);
++            ctx.fill();
++            ctx.fillStyle = '#ffffff';
++            ctx.beginPath();
++            ctx.arc(5.5, -5, 0.8, 0, Math.PI * 2);
++            ctx.fill();
++
++            // Beak
++            const beakGrad = ctx.createLinearGradient(10, 0, 20, 0);
++            beakGrad.addColorStop(0, '#f97316');
++            beakGrad.addColorStop(1, '#ea580c');
++            ctx.fillStyle = beakGrad;
++            ctx.beginPath();
++            ctx.moveTo(11, -1.5);
++            ctx.lineTo(21, 1.5);
++            ctx.lineTo(10.5, 4.5);
++            ctx.closePath();
++            ctx.fill();
++            ctx.stroke();
++
++            // Wing (flapping) & legs (physics-driven)
++            this.drawLimbWing(ctx, 28, 28, bird, skin);
++            this.drawLimbLegs(ctx, 28, 28, bird, skin);
++        }
+ 
+         ctx.restore();
+     }

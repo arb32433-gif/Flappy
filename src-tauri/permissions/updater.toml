@@ -1,0 +1,10 @@
+"$schema" = "https://schema.tauri.app/config/2/permissions"
+
+[[permission]]
+identifier = "allow-updater-commands"
+description = "Allows checking, downloading, and installing app updates"
+commands.allow = [
+    "plugin:updater|check",
+    "plugin:updater|download",
+    "plugin:updater|install"
+]

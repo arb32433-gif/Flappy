@@ -27,3 +27,5 @@ src-tauri/gen/schemas/
 
 # Ignore Smart Environment folder
 .smart-env
+# Tauri signing private key - NEVER commit this
+*.key

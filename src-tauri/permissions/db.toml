@@ -1,0 +1,15 @@
+[[permission]]
+identifier = "allow-db-commands"
+description = "Enables database commands for the app"
+commands.allow = [
+  "db_init",
+  "db_add_score",
+  "db_get_scores",
+  "db_get_high_score",
+  "db_get_stats",
+  "db_delete_score",
+  "db_archive_score",
+  "db_get_archives",
+  "db_get_archive_count",
+  "db_delete_archive"
+]

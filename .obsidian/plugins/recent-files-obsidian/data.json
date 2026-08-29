@@ -1,6 +1,14 @@
 {
   "recentFiles": [
     {
+      "basename": "Implementation_tasks_packaging",
+      "path": "Document/Tasks/Implementation_tasks_packaging.md"
+    },
+    {
+      "basename": "readme",
+      "path": "readme.md"
+    },
+    {
       "basename": "Untitled",
       "path": "Untitled.canvas"
     },
@@ -11,10 +19,6 @@
     {
       "basename": "Implementation_tasks_flappy",
       "path": "Document/Tasks/Implementation_tasks_flappy.md"
-    },
-    {
-      "basename": "Implementation_tasks_packaging",
-      "path": "Document/Tasks/Implementation_tasks_packaging.md"
     },
     {
       "basename": "Suggested_improvements_Flappy bird_game (SGIM-001)",

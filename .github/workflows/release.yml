@@ -1,0 +1,104 @@
+name: Release
+
+# Trigger: push a version tag like  v0.3.0  →  git tag v0.3.0 && git push --tags
+on:
+  push:
+    tags:
+      - 'v*.*.*'
+
+jobs:
+  release-windows:
+    runs-on: windows-latest
+    permissions:
+      contents: write   # needed to create GitHub Releases
+
+    steps:
+      # 1. Checkout source
+      - name: Checkout
+        uses: actions/checkout@v4
+
+      # 2. Setup Node.js
+      - name: Setup Node.js
+        uses: actions/setup-node@v4
+        with:
+          node-version: '20'
+          cache: 'npm'
+
+      # 3. Setup Rust (stable)
+      - name: Setup Rust
+        uses: dtolnay/rust-toolchain@stable
+
+      # 4. Cache Cargo registry + build artifacts for faster rebuilds
+      - name: Cache Cargo
+        uses: actions/cache@v4
+        with:
+          path: |
+            ~/.cargo/registry
+            ~/.cargo/git
+            src-tauri/target
+          key: ${{ runner.os }}-cargo-${{ hashFiles('**/Cargo.lock') }}
+          restore-keys: ${{ runner.os }}-cargo-
+
+      # 5. Install frontend dependencies
+      - name: Install npm dependencies
+        run: npm ci
+
+      # 6. Build the Tauri app and create a signed installer
+      #    TAURI_SIGNING_PRIVATE_KEY → set this in GitHub repo Secrets
+      - name: Build Tauri app
+        run: npm run tauri build
+        env:
+          TAURI_SIGNING_PRIVATE_KEY: ${{ secrets.TAURI_SIGNING_PRIVATE_KEY }}
+          TAURI_SIGNING_PRIVATE_KEY_PASSWORD: ''
+
+      # 7. Extract the version number from the tag (e.g. v0.3.0 → 0.3.0)
+      - name: Extract version
+        id: version
+        shell: bash
+        run: echo "VERSION=${GITHUB_REF_NAME#v}" >> $GITHUB_OUTPUT
+
+      # 8. Build the latest.json update manifest
+      #    Tauri creates a .sig file alongside the installer — we embed it here.
+      - name: Build latest.json
+        shell: pwsh
+        run: |
+          $version = "${{ steps.version.outputs.VERSION }}"
+          $sigPath  = "src-tauri\target\release\bundle\nsis\flappyflight_${version}_x64-setup.exe.sig"
+          $sig      = Get-Content $sigPath -Raw
+
+          $manifest = @{
+            version  = $version
+            notes    = "See the full changelog at https://github.com/arb32433-gif/Flappy/releases/tag/v${version}"
+            pub_date = (Get-Date -Format "o")
+            platforms = @{
+              "windows-x86_64" = @{
+                signature = $sig.Trim()
+                url       = "https://github.com/arb32433-gif/Flappy/releases/download/v${version}/flappyflight_${version}_x64-setup.exe"
+              }
+            }
+          } | ConvertTo-Json -Depth 5
+
+          Set-Content -Path "latest.json" -Value $manifest -Encoding UTF8
+          Write-Host "Generated latest.json:"
+          Get-Content "latest.json"
+
+      # 9. Publish GitHub Release with installer + latest.json
+      - name: Create GitHub Release
+        uses: softprops/action-gh-release@v2
+        with:
+          tag_name: ${{ github.ref_name }}
+          name: "flappyflight ${{ github.ref_name }}"
+          body: |
+            ## What's new in ${{ github.ref_name }}
+
+            _Add release notes here (edit on GitHub after publishing)._
+
+            ### Installation
+            Download the installer below and run it — existing installs will auto-update on next launch.
+          draft: false
+          prerelease: false
+          files: |
+            src-tauri/target/release/bundle/nsis/flappyflight_${{ steps.version.outputs.VERSION }}_x64-setup.exe
+            latest.json
+        env:
+          GITHUB_TOKEN: ${{ secrets.GITHUB_TOKEN }}

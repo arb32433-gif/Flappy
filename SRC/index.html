@@ -1,9 +1,18 @@
 <!DOCTYPE html>
 <html lang="en">
 <head>
+    <script>
+        window.addEventListener('error', function(e) {
+            alert('JS Error: ' + e.message + ' at ' + e.filename + ':' + e.lineno + '\nStack: ' + (e.error ? e.error.stack : ''));
+        });
+        window.addEventListener('unhandledrejection', function(e) {
+            alert('Unhandled Rejection: ' + e.reason + '\nStack: ' + (e.reason && e.reason.stack ? e.reason.stack : ''));
+        });
+    </script>
     <meta charset="UTF-8">
     <meta name="viewport" content="width=device-width, initial-scale=1.0">
     <title>flappyflight - Event-Driven Flappy Bird</title>
+    <link rel="icon" href="favicon.ico">
     <link rel="stylesheet" href="style.css">
     <link rel="preload" href="fonts/outfit-latin.woff2" as="font" type="font/woff2" crossorigin>
 </head>
@@ -94,6 +103,30 @@
                                     <span class="skin-dot skin-dot-emerald"></span>
                                     Emerald
                                 </button>
+                                <button class="skin-btn" data-skin="bird_1" title="Bird 1">
+                                    <img src="assets/bird_1.png" class="skin-bird-thumb">
+                                    Bird 1
+                                </button>
+                                <button class="skin-btn" data-skin="bird_2" title="Bird 2">
+                                    <img src="assets/bird_2.png" class="skin-bird-thumb">
+                                    Bird 2
+                                </button>
+                                <button class="skin-btn" data-skin="bird_3" title="Bird 3">
+                                    <img src="assets/bird_3.png" class="skin-bird-thumb">
+                                    Bird 3
+                                </button>
+                                <button class="skin-btn" data-skin="bird_4" title="Bird 4">
+                                    <img src="assets/bird_4.png" class="skin-bird-thumb">
+                                    Bird 4
+                                </button>
+                                <button class="skin-btn" data-skin="bird_5" title="Bird 5">
+                                    <img src="assets/bird_5.png" class="skin-bird-thumb">
+                                    Bird 5
+                                </button>
+                                <button class="skin-btn" data-skin="bird_6" title="Bird 6">
+                                    <img src="assets/bird_6.png" class="skin-bird-thumb">
+                                    Bird 6
+                                </button>
                             </div>
                         </div>
 
@@ -126,13 +159,19 @@
         <div id="data-screen" class="overlay hidden">
             <div class="data-glass">
                 <div class="data-header">
-                    <h2 class="data-title">FLIGHT HISTORY LOGS</h2>
+                    <h2 class="data-title">FLIGHT RECORDS</h2>
                     <div class="data-header-right">
+                        <div class="data-tabs">
+                            <button id="tab-logs" class="data-tab active">Flight Logs</button>
+                            <button id="tab-archives" class="data-tab">Saved Archives</button>
+                        </div>
                         <p class="data-count" id="data-count">0 records</p>
                         <p class="data-arch-count" id="data-arch-count">&#128190; 0 saved</p>
                     </div>
                 </div>
-                <div class="data-table-wrap">
+
+                <!-- Flight Logs View -->
+                <div class="data-table-wrap" id="logs-view">
                     <table class="data-table">
                         <thead>
                             <tr>
@@ -140,13 +179,33 @@
                                 <th class="th-diff">Difficulty</th>
                                 <th class="th-score">Score</th>
                                 <th class="th-date">Date</th>
-                                <th class="th-actions">Actions</th>                            </tr>
+                                <th class="th-actions">Actions</th>
+                            </tr>
                         </thead>
                         <tbody id="data-tbody">
                         </tbody>
                     </table>
                     <p class="data-empty" id="data-empty">No flight logs yet. Start a new game to begin recording!</p>
                 </div>
+
+                <!-- Saved Archives View -->
+                <div class="data-table-wrap hidden" id="archives-view">
+                    <table class="data-table">
+                        <thead>
+                            <tr>
+                                <th class="th-num">#</th>
+                                <th class="th-diff">Difficulty</th>
+                                <th class="th-score">Score</th>
+                                <th class="th-date">Saved</th>
+                                <th class="th-actions">Actions</th>
+                            </tr>
+                        </thead>
+                        <tbody id="archives-tbody">
+                        </tbody>
+                    </table>
+                    <p class="data-empty" id="archives-empty">No saved flights yet. Use the Save button on a flight log to archive it here.</p>
+                </div>
+
                 <button id="data-back-btn" class="btn btn-back">Back to Menu</button>
             </div>
         </div>

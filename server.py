@@ -56,9 +56,9 @@ class GameHandler(http.server.SimpleHTTPRequestHandler):
 
             if path == "/api/scores":
                 diff = params.get("difficulty")
-                scores = db.get_recent_scores(limit=50, difficulty=diff)
+                scores = db.get_all_scores(difficulty=diff)
                 high_score = db.get_high_score(difficulty=diff) if diff else db.get_high_score("medium")
-                self.send_json({"scores": scores, "high_score": high_score})
+                self.send_json({"scores": scores, "total": len(scores), "high_score": high_score})
 
             elif path == "/api/scores/stats":
                 diff = params.get("difficulty")
